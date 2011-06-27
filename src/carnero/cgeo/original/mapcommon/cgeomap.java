@@ -801,15 +801,12 @@ public class cgeomap extends MapBase {
 							force = true;
 						}
 
-						//LeeB
-						// save new values
 						if (moved) {
 							liveChanged = false;
 
 							currentTime = System.currentTimeMillis();
 
 							if (1000 < (currentTime - loadThreadRun)) {
-								// from web
 								if (20000 < (currentTime - loadThreadRun)) {
 									force = true; // probably stucked thread
 								}
@@ -837,7 +834,7 @@ public class cgeomap extends MapBase {
 
 								loadThread = new LoadThread(centerLatitude, centerLongitude, spanLatitude, spanLongitude);
 								loadThread.setName("loadThread");
-								loadThread.start(); //loadThread will kick off downloadThread once it's done
+								loadThread.start();
 							}
 						}
 					}
@@ -957,12 +954,10 @@ public class cgeomap extends MapBase {
 					return;
 				}
 
-				//LeeB - I think this can be done better:
-				//1. fetch and draw(in another thread) caches from the db (fast? db read will be the slow bit)
-				//2. fetch and draw(in another thread) and then insert into the db caches from geocaching.com - dont draw/insert if exist in memory?
-
-				// stage 1 - pull and render from the DB only
-				if (settings.maplive == 0) {
+				// get from cache/DB
+				if (searchIdIntent != null) {
+					searchId = searchIdIntent;
+				} else if (settings.maplive == 0) {
 					searchId = app.getStoredInViewport(centerLat, centerLon, spanLat, spanLon, settings.cacheType);
 				} else {
 					searchId = app.getCachedInViewport(centerLat, centerLon, spanLat, spanLon, settings.cacheType);
@@ -1003,11 +998,8 @@ public class cgeomap extends MapBase {
 					return;
 				}
 
-				//*** this needs to be in it's own thread
-				// stage 2 - pull and render from geocaching.com
-				//this should just fetch and insert into the db _and_ be cancel-able if the viewport changes
-
-				if (settings.maplive >= 1) {
+				// download from web
+				if (live && settings.maplive >= 1) {
 					if (downloadThread != null && downloadThread.isWorking()) {
 						downloadThread.stopIt();
 					}
