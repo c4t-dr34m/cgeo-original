@@ -1,8 +1,8 @@
 package carnero.cgeo.original.mapinterfaces;
 
-import carnero.cgeo.original.cgSettings;
-import carnero.cgeo.original.mapcommon.cgMapOverlay;
-import carnero.cgeo.original.mapcommon.cgUsersOverlay;
+import carnero.cgeo.original.libs.Settings;
+import carnero.cgeo.original.mapcommon.MapOverlay;
+import carnero.cgeo.original.mapcommon.UsersOverlay;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
@@ -51,15 +51,15 @@ public interface MapViewImpl {
 
 	Context getContext();
 
-	cgMapOverlay createAddMapOverlay(cgSettings settings, Context context,
+	MapOverlay createAddMapOverlay(Settings settings, Context context,
 			Drawable drawable, boolean fromDetailIntent);
 
-	cgUsersOverlay createAddUsersOverlay(Context context, Drawable markerIn);
+	UsersOverlay createAddUsersOverlay(Context context, Drawable markerIn);
 
 	boolean needsScaleOverlay();
 
 	void setBuiltinScale(boolean b);
 
-	void setMapSource(cgSettings settings);
+	void setMapSource(Settings settings);
 
 }

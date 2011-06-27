@@ -1,5 +1,10 @@
 package carnero.cgeo.original;
 
+import carnero.cgeo.original.libs.LogForm;
+import carnero.cgeo.original.models.Trackable;
+import carnero.cgeo.original.libs.Settings;
+import carnero.cgeo.original.libs.Base;
+import carnero.cgeo.original.libs.Warning;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -23,16 +28,16 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-public class cgeotouch extends cgLogForm {
+public class cgeotouch extends LogForm {
 
 	private cgeoapplication app = null;
 	private Activity activity = null;
 	private Resources res = null;
 	private LayoutInflater inflater = null;
-	private cgBase base = null;
-	private cgSettings settings = null;
-	private cgWarning warning = null;
-	private cgTrackable trackable = null;
+	private Base base = null;
+	private Settings settings = null;
+	private Warning warning = null;
+	private Trackable trackable = null;
 	private ArrayList<Integer> types = new ArrayList<Integer>();
 	private ProgressDialog waitDialog = null;
 	private String guid = null;
@@ -100,8 +105,8 @@ public class cgeotouch extends cgLogForm {
 					warning.showToast(res.getString(R.string.err_log_post_failed));
 				}
 			} else {
-				if (cgBase.errorRetrieve.get(msg.what) != null) {
-					warning.showToast(res.getString(R.string.err_log_post_failed_because) + cgBase.errorRetrieve.get(msg.what) + ".");
+				if (Base.errorRetrieve.get(msg.what) != null) {
+					warning.showToast(res.getString(R.string.err_log_post_failed_because) + Base.errorRetrieve.get(msg.what) + ".");
 				} else {
 					warning.showToast(res.getString(R.string.err_log_post_failed));
 				}
@@ -121,9 +126,9 @@ public class cgeotouch extends cgLogForm {
 		activity = this;
 		res = this.getResources();
 		app = (cgeoapplication) this.getApplication();
-		settings = new cgSettings(this, getSharedPreferences(cgSettings.preferences, 0));
-		base = new cgBase(app, settings, getSharedPreferences(cgSettings.preferences, 0));
-		warning = new cgWarning(this);
+		settings = new Settings(this, getSharedPreferences(Settings.preferences, 0));
+		base = new Base(app, settings, getSharedPreferences(Settings.preferences, 0));
+		warning = new Warning(this);
 
 		// set layout
 		if (settings.skin == 1) {
@@ -218,8 +223,8 @@ public class cgeotouch extends cgLogForm {
 		if ((id >= 0x1 && id <= 0x7)) {
 			text = (EditText) findViewById(R.id.log);
 			textContent = text.getText().toString();
-			dateString = cgBase.dateOut.format(new Date());
-			timeString = cgBase.timeOut.format(new Date());
+			dateString = Base.dateOut.format(new Date());
+			timeString = Base.timeOut.format(new Date());
 
 			if ((id & 0x4) == 0x4) {
 				addText += dateString;
@@ -254,7 +259,7 @@ public class cgeotouch extends cgLogForm {
 
 		if (viewId == R.id.type) {
 			for (final int typeOne : types) {
-				menu.add(viewId, typeOne, 0, cgBase.logTypes2.get(typeOne));
+				menu.add(viewId, typeOne, 0, Base.logTypes2.get(typeOne));
 			}
 		}
 	}
@@ -279,19 +284,19 @@ public class cgeotouch extends cgLogForm {
 		}
 
 		types.clear();
-		types.add(cgBase.LOG_RETRIEVED_IT);
-		types.add(cgBase.LOG_GRABBED_IT);
-		types.add(cgBase.LOG_NOTE);
-		types.add(cgBase.LOG_DISCOVERED_IT);
+		types.add(Base.LOG_RETRIEVED_IT);
+		types.add(Base.LOG_GRABBED_IT);
+		types.add(Base.LOG_NOTE);
+		types.add(Base.LOG_DISCOVERED_IT);
 
-		if (typeSelected < 0 && cgBase.logTypes2.get(typeSelected) == null) {
+		if (typeSelected < 0 && Base.logTypes2.get(typeSelected) == null) {
 			typeSelected = types.get(2);
 		}
 		setType(typeSelected);
 
 		Button typeButton = (Button) findViewById(R.id.type);
 		registerForContextMenu(typeButton);
-		typeButton.setText(cgBase.logTypes2.get(typeSelected));
+		typeButton.setText(Base.logTypes2.get(typeSelected));
 		typeButton.setOnClickListener(new View.OnClickListener() {
 
 			public void onClick(View view) {
@@ -300,7 +305,7 @@ public class cgeotouch extends cgLogForm {
 		});
 
 		Button dateButton = (Button) findViewById(R.id.date);
-		dateButton.setText(cgBase.dateOutShort.format(date.getTime()));
+		dateButton.setText(Base.dateOutShort.format(date.getTime()));
 		dateButton.setOnClickListener(new cgeotouchDateListener());
 
 		Button buttonPost = (Button) findViewById(R.id.post);
@@ -322,19 +327,19 @@ public class cgeotouch extends cgLogForm {
 		date = dateIn;
 
 		final Button dateButton = (Button) findViewById(R.id.date);
-		dateButton.setText(cgBase.dateOutShort.format(date.getTime()));
+		dateButton.setText(Base.dateOutShort.format(date.getTime()));
 	}
 
 	public void setType(int type) {
 		final Button typeButton = (Button) findViewById(R.id.type);
 
-		if (cgBase.logTypes2.get(type) != null) {
+		if (Base.logTypes2.get(type) != null) {
 			typeSelected = type;
 		}
-		if (cgBase.logTypes2.get(typeSelected) == null) {
+		if (Base.logTypes2.get(typeSelected) == null) {
 			typeSelected = 0;
 		}
-		typeButton.setText(cgBase.logTypes2.get(typeSelected));
+		typeButton.setText(Base.logTypes2.get(typeSelected));
 	}
 
 	private class cgeotouchDateListener implements View.OnClickListener {
@@ -412,7 +417,7 @@ public class cgeotouch extends cgLogForm {
 					warning.showToast(res.getString(R.string.info_log_type_changed));
 				}
 			} catch (Exception e) {
-				Log.e(cgSettings.tag, "cgeotouch.loadData.run: " + e.toString());
+				Log.e(Settings.tag, "cgeotouch.loadData.run: " + e.toString());
 			}
 
 			loadDataHandler.sendEmptyMessage(0);
@@ -449,7 +454,7 @@ public class cgeotouch extends cgLogForm {
 
 			return status;
 		} catch (Exception e) {
-			Log.e(cgSettings.tag, "cgeotouch.postLogFn: " + e.toString());
+			Log.e(Settings.tag, "cgeotouch.postLogFn: " + e.toString());
 		}
 
 		return 1000;

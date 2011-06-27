@@ -1,5 +1,9 @@
 package carnero.cgeo.original;
 
+import carnero.cgeo.original.models.Trackable;
+import carnero.cgeo.original.libs.Settings;
+import carnero.cgeo.original.libs.Base;
+import carnero.cgeo.original.libs.Warning;
 import java.util.ArrayList;
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -15,12 +19,12 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 
 public class cgeotrackables extends Activity {
-	private ArrayList<cgTrackable> trackables = new ArrayList<cgTrackable>();
+	private ArrayList<Trackable> trackables = new ArrayList<Trackable>();
 	private String geocode = null;
 	private cgeoapplication app = null;
-	private cgSettings settings = null;
-	private cgBase base = null;
-	private cgWarning warning = null;
+	private Settings settings = null;
+	private Base base = null;
+	private Warning warning = null;
 	private Activity activity = null;
 	private LayoutInflater inflater = null;
 	private LinearLayout addList = null;
@@ -49,7 +53,7 @@ public class cgeotrackables extends Activity {
 					return;
 				} else {
 					LinearLayout oneTbPre = null;
-					for (cgTrackable trackable : trackables) {
+					for (Trackable trackable : trackables) {
 						oneTbPre = (LinearLayout) inflater.inflate(R.layout.trackable_button, null);
 
 						Button oneTb = (Button) oneTbPre.findViewById(R.id.button);
@@ -72,7 +76,7 @@ public class cgeotrackables extends Activity {
 				if (waitDialog != null) {
 					waitDialog.dismiss();
 				}
-				Log.e(cgSettings.tag, "cgeotrackables.loadInventoryHandler: " + e.toString());
+				Log.e(Settings.tag, "cgeotrackables.loadInventoryHandler: " + e.toString());
 			}
 		}
 	};
@@ -84,9 +88,9 @@ public class cgeotrackables extends Activity {
 		// init
 		activity = this;
 		app = (cgeoapplication) this.getApplication();
-		settings = new cgSettings(this, getSharedPreferences(cgSettings.preferences, 0));
-		base = new cgBase(app, settings, getSharedPreferences(cgSettings.preferences, 0));
-		warning = new cgWarning(this);
+		settings = new Settings(this, getSharedPreferences(Settings.preferences, 0));
+		base = new Base(app, settings, getSharedPreferences(Settings.preferences, 0));
+		warning = new Warning(this);
 
 		// set layout
 		if (settings.skin == 1) {
@@ -136,7 +140,7 @@ public class cgeotrackables extends Activity {
 
 				loadInventoryHandler.sendMessage(new Message());
 			} catch (Exception e) {
-				Log.e(cgSettings.tag, "cgeotrackables.loadInventory.run: " + e.toString());
+				Log.e(Settings.tag, "cgeotrackables.loadInventory.run: " + e.toString());
 			}
 		}
 	}

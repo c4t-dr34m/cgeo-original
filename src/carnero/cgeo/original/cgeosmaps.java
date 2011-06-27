@@ -1,5 +1,8 @@
 package carnero.cgeo.original;
 
+import carnero.cgeo.original.libs.Settings;
+import carnero.cgeo.original.libs.Base;
+import carnero.cgeo.original.libs.Warning;
 import java.util.ArrayList;
 
 import android.app.Activity;
@@ -23,9 +26,9 @@ public class cgeosmaps extends Activity {
 	private Resources res = null;
 	private cgeoapplication app = null;
 	private Activity activity = null;
-	private cgSettings settings = null;
-	private cgBase base = null;
-	private cgWarning warning = null;
+	private Settings settings = null;
+	private Base base = null;
+	private Warning warning = null;
 	private LayoutInflater inflater = null;
 	private ProgressDialog waitDialog = null;
 	private LinearLayout smapsView = null;
@@ -73,7 +76,7 @@ public class cgeosmaps extends Activity {
 				if (waitDialog != null) {
 					waitDialog.dismiss();
 				}
-				Log.e(cgSettings.tag, "cgeosmaps.loadMapsHandler: " + e.toString());
+				Log.e(Settings.tag, "cgeosmaps.loadMapsHandler: " + e.toString());
 			}
 		}
 	};
@@ -86,9 +89,9 @@ public class cgeosmaps extends Activity {
 		activity = this;
 		res = this.getResources();
 		app = (cgeoapplication) this.getApplication();
-		settings = new cgSettings(this, getSharedPreferences(cgSettings.preferences, 0));
-		base = new cgBase(app, settings, getSharedPreferences(cgSettings.preferences, 0));
-		warning = new cgWarning(this);
+		settings = new Settings(this, getSharedPreferences(Settings.preferences, 0));
+		base = new Base(app, settings, getSharedPreferences(Settings.preferences, 0));
+		warning = new Warning(this);
 
 		// set layout
 		if (settings.skin == 1) {
@@ -142,7 +145,7 @@ public class cgeosmaps extends Activity {
 							maps.add(image);
 						}
 					} catch (Exception e) {
-						Log.e(cgSettings.tag, "cgeosmaps.loadMaps.run.1: " + e.toString());
+						Log.e(Settings.tag, "cgeosmaps.loadMaps.run.1: " + e.toString());
 					}
 				}
 
@@ -154,14 +157,14 @@ public class cgeosmaps extends Activity {
 								maps.add(image);
 							}
 						} catch (Exception e) {
-							Log.e(cgSettings.tag, "cgeosmaps.loadMaps.run.2: " + e.toString());
+							Log.e(Settings.tag, "cgeosmaps.loadMaps.run.2: " + e.toString());
 						}
 					}
 				}
 
 				loadMapsHandler.sendMessage(new Message());
 			} catch (Exception e) {
-				Log.e(cgSettings.tag, "cgeosmaps.loadMaps.run: " + e.toString());
+				Log.e(Settings.tag, "cgeosmaps.loadMaps.run: " + e.toString());
 			}
 		}
 	}

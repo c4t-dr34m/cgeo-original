@@ -6,14 +6,14 @@ import org.mapsforge.android.maps.OverlayItem;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import carnero.cgeo.original.R;
-import carnero.cgeo.original.cgUser;
+import carnero.cgeo.original.models.User;
 import carnero.cgeo.original.mapinterfaces.UserOverlayItemImpl;
 
 public class mfUsersOverlayItem extends OverlayItem implements UserOverlayItemImpl {
 	private Context context = null;
-	private cgUser user = null;
+	private User user = null;
 
-	public mfUsersOverlayItem(Context contextIn, cgUser userIn) {
+	public mfUsersOverlayItem(Context contextIn, User userIn) {
 		super(new GeoPoint((int)(userIn.latitude * 1e6), (int)(userIn.longitude * 1e6)), userIn.username, "");
 
 		context = contextIn;
@@ -37,7 +37,7 @@ public class mfUsersOverlayItem extends OverlayItem implements UserOverlayItemIm
 		return marker;
 	}
 
-	public cgUser getUser() {
+	public User getUser() {
 		return user;
 	}
 }

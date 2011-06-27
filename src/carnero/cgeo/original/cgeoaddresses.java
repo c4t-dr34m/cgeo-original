@@ -1,5 +1,8 @@
 package carnero.cgeo.original;
 
+import carnero.cgeo.original.libs.Settings;
+import carnero.cgeo.original.libs.Base;
+import carnero.cgeo.original.libs.Warning;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import java.util.ArrayList;
@@ -23,10 +26,10 @@ public class cgeoaddresses extends Activity {
 	private String keyword = null;
 	private Activity activity = null;
 	private cgeoapplication app = null;
-	private cgSettings settings = null;
-	private cgBase base = null;
+	private Settings settings = null;
+	private Base base = null;
 	private Resources res = null;
-	private cgWarning warning = null;
+	private Warning warning = null;
 	private LayoutInflater inflater = null;
 	private LinearLayout addList = null;
 	private ProgressDialog waitDialog = null;
@@ -87,7 +90,7 @@ public class cgeoaddresses extends Activity {
 				if (waitDialog != null) {
 					waitDialog.dismiss();
 				}
-				Log.e(cgSettings.tag, "cgeoaddresses.loadCachesHandler: " + e.toString());
+				Log.e(Settings.tag, "cgeoaddresses.loadCachesHandler: " + e.toString());
 			}
 		}
 	};
@@ -100,9 +103,9 @@ public class cgeoaddresses extends Activity {
 		activity = this;
 		res = this.getResources();
 		app = (cgeoapplication) this.getApplication();
-		settings = new cgSettings(this, getSharedPreferences(cgSettings.preferences, 0));
-		base = new cgBase(app, settings, getSharedPreferences(cgSettings.preferences, 0));
-		warning = new cgWarning(this);
+		settings = new Settings(this, getSharedPreferences(Settings.preferences, 0));
+		base = new Base(app, settings, getSharedPreferences(Settings.preferences, 0));
+		warning = new Warning(this);
 		inflater = getLayoutInflater();
 
 		// set layout
@@ -162,7 +165,7 @@ public class cgeoaddresses extends Activity {
 					addresses.add(address);
 				}
 			} catch (Exception e) {
-				Log.e(cgSettings.tag, "cgeoaddresses.loadPlaces.run: " + e.toString());
+				Log.e(Settings.tag, "cgeoaddresses.loadPlaces.run: " + e.toString());
 			}
 
 			loadPlacesHandler.sendMessage(new Message());

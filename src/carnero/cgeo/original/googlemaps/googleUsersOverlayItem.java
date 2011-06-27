@@ -3,7 +3,7 @@ package carnero.cgeo.original.googlemaps;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import carnero.cgeo.original.R;
-import carnero.cgeo.original.cgUser;
+import carnero.cgeo.original.models.User;
 import carnero.cgeo.original.mapinterfaces.UserOverlayItemImpl;
 
 import com.google.android.maps.GeoPoint;
@@ -11,9 +11,9 @@ import com.google.android.maps.OverlayItem;
 
 public class googleUsersOverlayItem extends OverlayItem implements UserOverlayItemImpl {
 	private Context context = null;
-	private cgUser user = null;
+	private User user = null;
 
-	public googleUsersOverlayItem(Context contextIn, cgUser userIn) {
+	public googleUsersOverlayItem(Context contextIn, User userIn) {
 		super(new GeoPoint((int)(userIn.latitude * 1e6), (int)(userIn.longitude * 1e6)), userIn.username, "");
 
 		context = contextIn;
@@ -37,7 +37,7 @@ public class googleUsersOverlayItem extends OverlayItem implements UserOverlayIt
 		return marker;
 	}
 
-	public cgUser getUser() {
+	public User getUser() {
 		return user;
 	}
 }

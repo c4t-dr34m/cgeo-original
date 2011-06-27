@@ -1,5 +1,12 @@
 package carnero.cgeo.original;
 
+import carnero.cgeo.original.models.Waypoint;
+import carnero.cgeo.original.models.Coord;
+import carnero.cgeo.original.libs.Settings;
+import carnero.cgeo.original.libs.Base;
+import carnero.cgeo.original.libs.UpdateLoc;
+import carnero.cgeo.original.libs.Geo;
+import carnero.cgeo.original.libs.Warning;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -35,18 +42,18 @@ public class cgeowaypoint extends Activity {
 	private static final int MENU_ID_RADAR = 3;
 	private static final int MENU_ID_COMPASS = 2;
 	private GoogleAnalyticsTracker tracker = null;
-	private cgWaypoint waypoint = null;
+	private Waypoint waypoint = null;
 	private String geocode = null;
 	private int id = -1;
 	private cgeoapplication app = null;
 	private Resources res = null;
 	private Activity activity = null;
-	private cgSettings settings = null;
-	private cgBase base = null;
-	private cgWarning warning = null;
+	private Settings settings = null;
+	private Base base = null;
+	private Warning warning = null;
 	private ProgressDialog waitDialog = null;
-	private cgGeo geo = null;
-	private cgUpdateLoc geoUpdate = new update();
+	private Geo geo = null;
+	private UpdateLoc geoUpdate = new update();
 	private Handler loadWaypointHandler = new Handler() {
 
 		@Override
@@ -111,7 +118,7 @@ public class cgeowaypoint extends Activity {
 					waitDialog.dismiss();
 					waitDialog = null;
 				}
-				Log.e(cgSettings.tag, "cgeowaypoint.loadWaypointHandler: " + e.toString());
+				Log.e(Settings.tag, "cgeowaypoint.loadWaypointHandler: " + e.toString());
 			}
 		}
 	};
@@ -124,9 +131,9 @@ public class cgeowaypoint extends Activity {
 		activity = this;
 		res = this.getResources();
 		app = (cgeoapplication) this.getApplication();
-		settings = new cgSettings(this, getSharedPreferences(cgSettings.preferences, 0));
-		base = new cgBase(app, settings, getSharedPreferences(cgSettings.preferences, 0));
-		warning = new cgWarning(this);
+		settings = new Settings(this, getSharedPreferences(Settings.preferences, 0));
+		base = new Base(app, settings, getSharedPreferences(Settings.preferences, 0));
+		warning = new Warning(this);
 
 		// set layout
 		if (settings.skin == 1) {
@@ -139,7 +146,7 @@ public class cgeowaypoint extends Activity {
 
 		// google analytics
 		tracker = GoogleAnalyticsTracker.getInstance();
-		tracker.start(cgSettings.analytics, this);
+		tracker.start(Settings.analytics, this);
 		tracker.dispatch();
 		base.sendAnal(activity, tracker, "/waypoint/detail");
 
@@ -278,13 +285,13 @@ public class cgeowaypoint extends Activity {
 			cachesAround();
 			return true;
 		} else if (menuItem == MENU_ID_LOCUS) {
-			base.runExternalMap(cgBase.mapAppLocus, activity, res, warning, tracker, waypoint); // locus
+			base.runExternalMap(Base.mapAppLocus, activity, res, warning, tracker, waypoint); // locus
 			return true;
 		} else if (menuItem == MENU_ID_RMAPS) {
-			base.runExternalMap(cgBase.mapAppRmaps, activity, res, warning, tracker, waypoint); // rmaps
+			base.runExternalMap(Base.mapAppRmaps, activity, res, warning, tracker, waypoint); // rmaps
 			return true;
 		} else if (menuItem == MENU_ID_EXTERN) {
-			base.runExternalMap(cgBase.mapAppAny, activity, res, warning, tracker, waypoint); // extern
+			base.runExternalMap(Base.mapAppAny, activity, res, warning, tracker, waypoint); // extern
 			return true;
 		}
 
@@ -310,7 +317,7 @@ public class cgeowaypoint extends Activity {
 		}
 
 		try {
-			if (cgBase.isIntentAvailable(activity, "com.google.android.radar.SHOW_RADAR") == true) {
+			if (Base.isIntentAvailable(activity, "com.google.android.radar.SHOW_RADAR") == true) {
 				Intent radarIntent = new Intent("com.google.android.radar.SHOW_RADAR");
 				radarIntent.putExtra("latitude", new Float(waypoint.latitude));
 				radarIntent.putExtra("longitude", new Float(waypoint.longitude));
@@ -328,7 +335,7 @@ public class cgeowaypoint extends Activity {
 							dialog.cancel();
 						} catch (Exception e) {
 							warning.showToast(res.getString(R.string.err_radar_market));
-							Log.e(cgSettings.tag, "cgeowaypoint.radarTo.onClick: " + e.toString());
+							Log.e(Settings.tag, "cgeowaypoint.radarTo.onClick: " + e.toString());
 						}
 					}
 				});
@@ -344,7 +351,7 @@ public class cgeowaypoint extends Activity {
 			}
 		} catch (Exception e) {
 			warning.showToast(res.getString(R.string.err_radar_generic));
-			Log.e(cgSettings.tag, "cgeowaypoint.radarTo: " + e.toString());
+			Log.e(Settings.tag, "cgeowaypoint.radarTo: " + e.toString());
 		}
 	}
 
@@ -375,15 +382,15 @@ public class cgeowaypoint extends Activity {
 
 				loadWaypointHandler.sendMessage(new Message());
 			} catch (Exception e) {
-				Log.e(cgSettings.tag, "cgeowaypoint.loadWaypoint.run: " + e.toString());
+				Log.e(Settings.tag, "cgeowaypoint.loadWaypoint.run: " + e.toString());
 			}
 		}
 	}
 
-	private class update extends cgUpdateLoc {
+	private class update extends UpdateLoc {
 
 		@Override
-		public void updateLoc(cgGeo geo) {
+		public void updateLoc(Geo geo) {
 			// nothing
 		}
 	}
@@ -441,8 +448,8 @@ public class cgeowaypoint extends Activity {
 		if (cgeonavigate.coordinates != null) {
 			cgeonavigate.coordinates.clear();
 		}
-		cgeonavigate.coordinates = new ArrayList<cgCoord>();
-		cgeonavigate.coordinates.add(new cgCoord(waypoint));
+		cgeonavigate.coordinates = new ArrayList<Coord>();
+		cgeonavigate.coordinates.add(new Coord(waypoint));
 		activity.startActivity(navigateIntent);
 	}
 }

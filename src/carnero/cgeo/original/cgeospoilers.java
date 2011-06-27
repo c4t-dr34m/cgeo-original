@@ -1,5 +1,10 @@
 package carnero.cgeo.original;
 
+import carnero.cgeo.original.models.Spoiler;
+import carnero.cgeo.original.libs.Settings;
+import carnero.cgeo.original.libs.Base;
+import carnero.cgeo.original.libs.HtmlImg;
+import carnero.cgeo.original.libs.Warning;
 import java.util.ArrayList;
 import android.os.Bundle;
 import android.os.Handler;
@@ -21,14 +26,14 @@ import android.graphics.drawable.BitmapDrawable;
 import android.view.ViewGroup.LayoutParams;
 
 public class cgeospoilers extends Activity {
-	private ArrayList<cgSpoiler> spoilers = new ArrayList<cgSpoiler>();
+	private ArrayList<Spoiler> spoilers = new ArrayList<Spoiler>();
 	private Resources res = null;
 	private String geocode = null;
 	private cgeoapplication app = null;
 	private Activity activity = null;
-	private cgSettings settings = null;
-	private cgBase base = null;
-	private cgWarning warning = null;
+	private Settings settings = null;
+	private Base base = null;
+	private Warning warning = null;
 	private LayoutInflater inflater = null;
 	private ProgressDialog progressDialog = null;
 	private ProgressDialog waitDialog = null;
@@ -70,7 +75,7 @@ public class cgeospoilers extends Activity {
 					progressDialog.show();
 
 					LinearLayout rowView = null;
-					for (final cgSpoiler spl : spoilers) {
+					for (final Spoiler spl : spoilers) {
 						rowView = (LinearLayout) inflater.inflate(R.layout.spoiler_item, null);
 
 						((TextView) rowView.findViewById(R.id.title)).setText(Html.fromHtml(spl.title));
@@ -89,13 +94,13 @@ public class cgeospoilers extends Activity {
 							public void run() {
 								BitmapDrawable image = null;
 								try {
-									cgHtmlImg imgGetter = new cgHtmlImg(activity, settings, geocode, true, offline, false);
+									HtmlImg imgGetter = new HtmlImg(activity, settings, geocode, true, offline, false);
 
 									image = imgGetter.getDrawable(spl.url);
 									Message message = handler.obtainMessage(0, image);
 									handler.sendMessage(message);
 								} catch (Exception e) {
-									Log.e(cgSettings.tag, "cgeospoilers.onCreate.onClick.run: " + e.toString());
+									Log.e(Settings.tag, "cgeospoilers.onCreate.onClick.run: " + e.toString());
 								}
 
 							}
@@ -108,7 +113,7 @@ public class cgeospoilers extends Activity {
 				if (waitDialog != null) {
 					waitDialog.dismiss();
 				}
-				Log.e(cgSettings.tag, "cgeospoilers.loadSpoilersHandler: " + e.toString());
+				Log.e(Settings.tag, "cgeospoilers.loadSpoilersHandler: " + e.toString());
 			}
 		}
 	};
@@ -121,9 +126,9 @@ public class cgeospoilers extends Activity {
 		activity = this;
 		res = this.getResources();
 		app = (cgeoapplication) this.getApplication();
-		settings = new cgSettings(this, getSharedPreferences(cgSettings.preferences, 0));
-		base = new cgBase(app, settings, getSharedPreferences(cgSettings.preferences, 0));
-		warning = new cgWarning(this);
+		settings = new Settings(this, getSharedPreferences(Settings.preferences, 0));
+		base = new Base(app, settings, getSharedPreferences(Settings.preferences, 0));
+		warning = new Warning(this);
 
 		// set layout
 		if (settings.skin == 1) {
@@ -178,7 +183,7 @@ public class cgeospoilers extends Activity {
 
 				loadSpoilersHandler.sendMessage(new Message());
 			} catch (Exception e) {
-				Log.e(cgSettings.tag, "cgeospoilers.loadSpoilers.run: " + e.toString());
+				Log.e(Settings.tag, "cgeospoilers.loadSpoilers.run: " + e.toString());
 			}
 		}
 	}
@@ -186,9 +191,9 @@ public class cgeospoilers extends Activity {
 	private class onLoadHandler extends Handler {
 
 		LinearLayout view = null;
-		cgSpoiler spoiler = null;
+		Spoiler spoiler = null;
 
-		public onLoadHandler(LinearLayout view, cgSpoiler spoiler) {
+		public onLoadHandler(LinearLayout view, Spoiler spoiler) {
 			this.view = view;
 			this.spoiler = spoiler;
 		}

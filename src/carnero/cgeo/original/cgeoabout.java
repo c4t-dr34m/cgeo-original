@@ -1,5 +1,7 @@
 package carnero.cgeo.original;
 
+import carnero.cgeo.original.libs.Settings;
+import carnero.cgeo.original.libs.Base;
 import android.app.Activity;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -12,8 +14,8 @@ import android.widget.TextView;
 public class cgeoabout extends Activity {
 	private Activity activity = null;
 	private Resources res = null;
-	private cgSettings settings = null;
-	private cgBase base = null;
+	private Settings settings = null;
+	private Base base = null;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -22,8 +24,8 @@ public class cgeoabout extends Activity {
 		// init
 		activity = this;
 		res = this.getResources();
-		settings = new cgSettings(this, this.getSharedPreferences(cgSettings.preferences, 0));
-		base = new cgBase((cgeoapplication) this.getApplication(), settings, this.getSharedPreferences(cgSettings.preferences, 0));
+		settings = new Settings(this, this.getSharedPreferences(Settings.preferences, 0));
+		base = new Base((cgeoapplication) this.getApplication(), settings, this.getSharedPreferences(Settings.preferences, 0));
 
 		// set layout
 		if (settings.skin == 1) {
@@ -61,7 +63,7 @@ public class cgeoabout extends Activity {
 
 			manager = null;
 		} catch (Exception e) {
-			Log.e(cgSettings.tag, "cgeoabout.init: Failed to obtain package version.");
+			Log.e(Settings.tag, "cgeoabout.init: Failed to obtain package version.");
 		}
 	}
 

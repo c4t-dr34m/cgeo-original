@@ -1,5 +1,9 @@
 package carnero.cgeo.original;
 
+import carnero.cgeo.original.libs.Base;
+import carnero.cgeo.original.libs.Warning;
+import carnero.cgeo.original.libs.Settings;
+
 import android.os.Bundle;
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -22,19 +26,18 @@ import android.widget.CheckBox;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.AdapterView.OnItemSelectedListener;
-
 import java.io.File;
 
-import carnero.cgeo.original.cgSettings.mapSourceEnum;
+import carnero.cgeo.original.libs.Settings.mapSourceEnum;
 
 public class cgeoinit extends Activity {
 
 	private cgeoapplication app = null;
 	private Resources res = null;
 	private Activity activity = null;
-	private cgSettings settings = null;
-	private cgBase base = null;
-	private cgWarning warning = null;
+	private Settings settings = null;
+	private Base base = null;
+	private Warning warning = null;
 	private SharedPreferences prefs = null;
 	private ProgressDialog loginDialog = null;
 	private Handler logInHandler = new Handler() {
@@ -49,9 +52,9 @@ public class cgeoinit extends Activity {
 				if (msg.what == 1) {
 					warning.helpDialog(res.getString(R.string.init_login_popup), res.getString(R.string.init_login_popup_ok));
 				} else {
-					if (cgBase.errorRetrieve.containsKey(msg.what) == true) {
+					if (Base.errorRetrieve.containsKey(msg.what) == true) {
 						warning.helpDialog(res.getString(R.string.init_login_popup),
-								res.getString(R.string.init_login_popup_failed_reason) + " " + cgBase.errorRetrieve.get(msg.what) + ".");
+								res.getString(R.string.init_login_popup_failed_reason) + " " + Base.errorRetrieve.get(msg.what) + ".");
 					} else {
 						warning.helpDialog(res.getString(R.string.init_login_popup), res.getString(R.string.init_login_popup_failed));
 					}
@@ -59,7 +62,7 @@ public class cgeoinit extends Activity {
 			} catch (Exception e) {
 				warning.showToast(res.getString(R.string.err_login_failed));
 
-				Log.e(cgSettings.tag, "cgeoinit.logInHandler: " + e.toString());
+				Log.e(Settings.tag, "cgeoinit.logInHandler: " + e.toString());
 			}
 
 			if (loginDialog != null && loginDialog.isShowing() == true) {
@@ -78,10 +81,10 @@ public class cgeoinit extends Activity {
 		activity = this;
 		res = this.getResources();
 		app = (cgeoapplication) this.getApplication();
-		prefs = getSharedPreferences(cgSettings.preferences, 0);
-		settings = new cgSettings(this, prefs);
-		base = new cgBase(app, settings, prefs);
-		warning = new cgWarning(this);
+		prefs = getSharedPreferences(Settings.preferences, 0);
+		settings = new Settings(this, prefs);
+		base = new Base(app, settings, prefs);
+		warning = new Warning(this);
 
 		// set layout
 		if (settings.skin == 1) {
@@ -269,7 +272,7 @@ public class cgeoinit extends Activity {
 		livelistButton.setOnClickListener(new cgeoChangeLivelist());
 
 		CheckBox unitsButton = (CheckBox) findViewById(R.id.units);
-		if (prefs.getInt("units", cgSettings.unitsMetric) == cgSettings.unitsMetric) {
+		if (prefs.getInt("units", Settings.unitsMetric) == Settings.unitsMetric) {
 			unitsButton.setChecked(false);
 		} else {
 			unitsButton.setChecked(true);
@@ -315,7 +318,7 @@ public class cgeoinit extends Activity {
 		TextView lastBackup = (TextView) findViewById(R.id.backup_last);
 		File lastBackupFile = app.isRestoreFile();
 		if (lastBackupFile != null) {
-			lastBackup.setText(res.getString(R.string.init_backup_last) + " " + cgBase.timeOut.format(lastBackupFile.lastModified()) + ", " + cgBase.dateOut.format(lastBackupFile.lastModified()));
+			lastBackup.setText(res.getString(R.string.init_backup_last) + " " + Base.timeOut.format(lastBackupFile.lastModified()) + ", " + Base.dateOut.format(lastBackupFile.lastModified()));
 		} else {
 			lastBackup.setText(res.getString(R.string.init_backup_last_no));
 		}
@@ -334,7 +337,7 @@ public class cgeoinit extends Activity {
 		TextView lastBackup = (TextView) findViewById(R.id.backup_last);
 		File lastBackupFile = app.isRestoreFile();
 		if (lastBackupFile != null) {
-			lastBackup.setText(res.getString(R.string.init_backup_last) + " " + cgBase.timeOut.format(lastBackupFile.lastModified()) + ", " + cgBase.dateOut.format(lastBackupFile.lastModified()));
+			lastBackup.setText(res.getString(R.string.init_backup_last) + " " + Base.timeOut.format(lastBackupFile.lastModified()) + ", " + Base.dateOut.format(lastBackupFile.lastModified()));
 		} else {
 			lastBackup.setText(res.getString(R.string.init_backup_last_no));
 		}
@@ -619,17 +622,17 @@ public class cgeoinit extends Activity {
 
 		public void onClick(View arg0) {
 			SharedPreferences.Editor edit = prefs.edit();
-			if (prefs.getInt("units", cgSettings.unitsMetric) == cgSettings.unitsMetric) {
-				edit.putInt("units", cgSettings.unitsImperial);
-				settings.units = cgSettings.unitsImperial;
+			if (prefs.getInt("units", Settings.unitsMetric) == Settings.unitsMetric) {
+				edit.putInt("units", Settings.unitsImperial);
+				settings.units = Settings.unitsImperial;
 			} else {
-				edit.putInt("units", cgSettings.unitsMetric);
-				settings.units = cgSettings.unitsMetric;
+				edit.putInt("units", Settings.unitsMetric);
+				settings.units = Settings.unitsMetric;
 			}
 			edit.commit();
 
 			CheckBox unitsButton = (CheckBox) findViewById(R.id.units);
-			if (prefs.getInt("units", cgSettings.unitsMetric) == cgSettings.unitsMetric) {
+			if (prefs.getInt("units", Settings.unitsMetric) == Settings.unitsMetric) {
 				unitsButton.setChecked(false);
 			} else {
 				unitsButton.setChecked(true);
@@ -690,8 +693,7 @@ public class cgeoinit extends Activity {
 	private class cgeoChangeMapSource implements OnItemSelectedListener {
 
 		@Override
-		public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2,
-				long arg3) {
+		public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
 			settings.mapProvider = mapSourceEnum.fromInt(arg2);
 			SharedPreferences.Editor edit = prefs.edit();
 			edit.putInt("mapsource", arg2);

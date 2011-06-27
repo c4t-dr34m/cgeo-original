@@ -44,7 +44,7 @@
 				android:textSize="26dip"
 				android:textColor="?text_color"
 				android:text="@null" />
-		<view class="carnero.cgeo.original.cgCompass"
+		<view class="carnero.cgeo.original.libs.Compass"
 				android:id="@+id/rose"
 				android:layout_width="fill_parent"
 				android:layout_height="295dip"

@@ -1,5 +1,9 @@
 package carnero.cgeo.original;
 
+import carnero.cgeo.original.libs.GPXListAdapter;
+import carnero.cgeo.original.libs.Settings;
+import carnero.cgeo.original.libs.Base;
+import carnero.cgeo.original.libs.Warning;
 import android.app.Activity;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
@@ -18,11 +22,11 @@ public class cgeogpxes extends ListActivity {
 
 	private ArrayList<File> files = new ArrayList<File>();
 	private cgeoapplication app = null;
-	private cgSettings settings = null;
-	private cgBase base = null;
-	private cgWarning warning = null;
+	private Settings settings = null;
+	private Base base = null;
+	private Warning warning = null;
 	private Activity activity = null;
-	private cgGPXListAdapter adapter = null;
+	private GPXListAdapter adapter = null;
 	private ProgressDialog waitDialog = null;
 	private ProgressDialog parseDialog = null;
 	private Resources res = null;
@@ -75,7 +79,7 @@ public class cgeogpxes extends ListActivity {
 				if (waitDialog != null) {
 					waitDialog.dismiss();
 				}
-				Log.e(cgSettings.tag, "cgeogpxes.loadFilesHandler: " + e.toString());
+				Log.e(Settings.tag, "cgeogpxes.loadFilesHandler: " + e.toString());
 			}
 		}
 	};
@@ -106,9 +110,9 @@ public class cgeogpxes extends ListActivity {
 		activity = this;
 		res = this.getResources();
 		app = (cgeoapplication) this.getApplication();
-		settings = new cgSettings(this, getSharedPreferences(cgSettings.preferences, 0));
-		base = new cgBase(app, settings, getSharedPreferences(cgSettings.preferences, 0));
-		warning = new cgWarning(this);
+		settings = new Settings(this, getSharedPreferences(Settings.preferences, 0));
+		base = new Base(app, settings, getSharedPreferences(Settings.preferences, 0));
+		warning = new Warning(this);
 
 		// set layout
 		if (settings.skin == 1) {
@@ -164,7 +168,7 @@ public class cgeogpxes extends ListActivity {
 
 	private void setAdapter() {
 		if (adapter == null) {
-			adapter = new cgGPXListAdapter(this, settings, files);
+			adapter = new GPXListAdapter(this, settings, files);
 			setListAdapter(adapter);
 		}
 	}
@@ -188,10 +192,10 @@ public class cgeogpxes extends ListActivity {
 						listDir(list, Environment.getExternalStorageDirectory());
 					}
 				} else {
-					Log.w(cgSettings.tag, "No external media mounted.");
+					Log.w(Settings.tag, "No external media mounted.");
 				}
 			} catch (Exception e) {
-				Log.e(cgSettings.tag, "cgeogpxes.loadFiles.run: " + e.toString());
+				Log.e(Settings.tag, "cgeogpxes.loadFiles.run: " + e.toString());
 			}
 
 			final Message msg = new Message();

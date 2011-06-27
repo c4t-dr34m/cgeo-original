@@ -1,5 +1,11 @@
 package carnero.cgeo.original;
 
+import carnero.cgeo.original.models.Waypoint;
+import carnero.cgeo.original.libs.Settings;
+import carnero.cgeo.original.libs.Base;
+import carnero.cgeo.original.libs.UpdateLoc;
+import carnero.cgeo.original.libs.Geo;
+import carnero.cgeo.original.libs.Warning;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.os.Bundle;
@@ -22,18 +28,18 @@ public class cgeowaypointadd extends Activity {
 
 	private cgeoapplication app = null;
 	private Resources res = null;
-	private cgSettings settings = null;
-	private cgBase base = null;
-	private cgWarning warning = null;
+	private Settings settings = null;
+	private Base base = null;
+	private Warning warning = null;
 	private Activity activity = null;
 	private String geocode = null;
 	private int id = -1;
-	private cgGeo geo = null;
-	private cgUpdateLoc geoUpdate = new update();
+	private Geo geo = null;
+	private UpdateLoc geoUpdate = new update();
 	private EditText latEdit = null;
 	private EditText lonEdit = null;
 	private ProgressDialog waitDialog = null;
-	private cgWaypoint waypoint = null;
+	private Waypoint waypoint = null;
 	private String type = "own";
 	private String prefix = "OWN";
 	private String lookup = "---";
@@ -76,7 +82,7 @@ public class cgeowaypointadd extends Activity {
 					waitDialog.dismiss();
 					waitDialog = null;
 				}
-				Log.e(cgSettings.tag, "cgeowaypointadd.loadWaypointHandler: " + e.toString());
+				Log.e(Settings.tag, "cgeowaypointadd.loadWaypointHandler: " + e.toString());
 			}
 		}
 	};
@@ -89,9 +95,9 @@ public class cgeowaypointadd extends Activity {
 		activity = this;
 		res = this.getResources();
 		app = (cgeoapplication) this.getApplication();
-		settings = new cgSettings(activity, activity.getSharedPreferences(cgSettings.preferences, 0));
-		base = new cgBase(app, settings, activity.getSharedPreferences(cgSettings.preferences, 0));
-		warning = new cgWarning(activity);
+		settings = new Settings(activity, activity.getSharedPreferences(Settings.preferences, 0));
+		base = new Base(app, settings, activity.getSharedPreferences(Settings.preferences, 0));
+		warning = new Warning(activity);
 
 		// set layout
 		if (settings.skin == 1) {
@@ -140,7 +146,7 @@ public class cgeowaypointadd extends Activity {
 		Button addWaypoint = (Button) findViewById(R.id.add_waypoint);
 		addWaypoint.setOnClickListener(new coordsListener());
 
-		ArrayList<String> wayPointNames = new ArrayList<String>(cgBase.waypointTypes.values());
+		ArrayList<String> wayPointNames = new ArrayList<String>(Base.waypointTypes.values());
 		AutoCompleteTextView textView = (AutoCompleteTextView) findViewById(R.id.name);
 		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, wayPointNames);
 		textView.setAdapter(adapter);
@@ -201,10 +207,10 @@ public class cgeowaypointadd extends Activity {
 		super.onPause();
 	}
 
-	private class update extends cgUpdateLoc {
+	private class update extends UpdateLoc {
 
 		@Override
-		public void updateLoc(cgGeo geo) {
+		public void updateLoc(Geo geo) {
 			if (geo == null) {
 				return;
 			}
@@ -220,7 +226,7 @@ public class cgeowaypointadd extends Activity {
 				latEdit.setHint(base.formatCoordinate(geo.latitudeNow, "lat", false));
 				lonEdit.setHint(base.formatCoordinate(geo.longitudeNow, "lon", false));
 			} catch (Exception e) {
-				Log.w(cgSettings.tag, "Failed to update location.");
+				Log.w(Settings.tag, "Failed to update location.");
 			}
 		}
 	}
@@ -234,7 +240,7 @@ public class cgeowaypointadd extends Activity {
 
 				loadWaypointHandler.sendMessage(new Message());
 			} catch (Exception e) {
-				Log.e(cgSettings.tag, "cgeowaypoint.loadWaypoint.run: " + e.toString());
+				Log.e(Settings.tag, "cgeowaypoint.loadWaypoint.run: " + e.toString());
 			}
 		}
 	}
@@ -336,7 +342,7 @@ public class cgeowaypointadd extends Activity {
 					distance = (new Double(matcherE.group(1))) * 1.609344;
 				} else {
 					try {
-						if (settings.units == cgSettings.unitsImperial) {
+						if (settings.units == Settings.unitsImperial) {
 							distance = (new Double(distanceText)) * 1.609344; // considering it miles
 						} else {
 							distance = (new Double(distanceText)) * 0.001; // considering it meters
@@ -381,7 +387,7 @@ public class cgeowaypointadd extends Activity {
 			}
 			final String note = ((EditText) findViewById(R.id.note)).getText().toString().trim();
 
-			final cgWaypoint waypoint = new cgWaypoint();
+			final Waypoint waypoint = new Waypoint();
 			waypoint.type = type;
 			waypoint.geocode = geocode;
 			waypoint.prefix = prefix;

@@ -5,9 +5,9 @@ import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.util.Log;
-import carnero.cgeo.original.cgSettings;
-import carnero.cgeo.original.mapcommon.cgMapOverlay;
-import carnero.cgeo.original.mapcommon.cgUsersOverlay;
+import carnero.cgeo.original.libs.Settings;
+import carnero.cgeo.original.mapcommon.MapOverlay;
+import carnero.cgeo.original.mapcommon.UsersOverlay;
 import carnero.cgeo.original.mapinterfaces.GeoPointImpl;
 import carnero.cgeo.original.mapinterfaces.MapControllerImpl;
 import carnero.cgeo.original.mapinterfaces.MapProjectionImpl;
@@ -41,7 +41,7 @@ public class googleMapView extends MapView implements MapViewImpl{
 
 			super.draw(canvas);
 		} catch (Exception e) {
-			Log.e(cgSettings.tag, "cgMapView.draw: " + e.toString());
+			Log.e(Settings.tag, "cgMapView.draw: " + e.toString());
 		}
 	}
 
@@ -50,7 +50,7 @@ public class googleMapView extends MapView implements MapViewImpl{
 		try {
 			super.displayZoomControls(takeFocus);
 		} catch (Exception e) {
-			Log.e(cgSettings.tag, "cgMapView.displayZoomControls: " + e.toString());
+			Log.e(Settings.tag, "cgMapView.displayZoomControls: " + e.toString());
 		}
 	}
 
@@ -81,7 +81,7 @@ public class googleMapView extends MapView implements MapViewImpl{
 	}
 
 	@Override
-	public cgMapOverlay createAddMapOverlay(cgSettings settings,
+	public MapOverlay createAddMapOverlay(Settings settings,
 			Context context, Drawable drawable, boolean fromDetailIntent) {
 		
 		googleCacheOverlay ovl = new googleCacheOverlay(settings, context, drawable, fromDetailIntent);
@@ -90,7 +90,7 @@ public class googleMapView extends MapView implements MapViewImpl{
 	}
 	
 	@Override
-	public cgUsersOverlay createAddUsersOverlay(Context context, Drawable markerIn) {
+	public UsersOverlay createAddUsersOverlay(Context context, Drawable markerIn) {
 		googleUsersOverlay ovl = new googleUsersOverlay(context, markerIn);
 		getOverlays().add(ovl);
 		return ovl.getBase();
@@ -102,7 +102,7 @@ public class googleMapView extends MapView implements MapViewImpl{
 	}
 
 	@Override
-	public void setMapSource(cgSettings settings) {
+	public void setMapSource(Settings settings) {
 		// nothing to do for google maps...
 	}
 

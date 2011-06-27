@@ -1,6 +1,6 @@
 package carnero.cgeo.original.mapinterfaces;
 
-import carnero.cgeo.original.cgUser;
+import carnero.cgeo.original.models.User;
 
 /**
  * Common functions of the provider-specific
@@ -10,5 +10,5 @@ import carnero.cgeo.original.cgUser;
  */
 public interface UserOverlayItemImpl extends OverlayItemImpl {
 
-	public cgUser getUser();
+	public User getUser();
 }

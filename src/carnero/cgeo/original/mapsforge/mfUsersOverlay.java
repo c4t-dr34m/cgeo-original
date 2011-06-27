@@ -7,22 +7,22 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
-import carnero.cgeo.original.mapcommon.cgUsersOverlay;
+import carnero.cgeo.original.mapcommon.UsersOverlay;
 import carnero.cgeo.original.mapinterfaces.ItemizedOverlayImpl;
 import carnero.cgeo.original.mapinterfaces.MapProjectionImpl;
 import carnero.cgeo.original.mapinterfaces.MapViewImpl;
 
 public class mfUsersOverlay extends ItemizedOverlay<mfUsersOverlayItem> implements ItemizedOverlayImpl {
 
-	private cgUsersOverlay base;
+	private UsersOverlay base;
 
 	public mfUsersOverlay(Context contextIn, Drawable markerIn) {
 		super(boundCenter(markerIn));
-		base = new cgUsersOverlay(this, contextIn);
+		base = new UsersOverlay(this, contextIn);
 	}
 	
 	@Override
-	public cgUsersOverlay getBase() {
+	public UsersOverlay getBase() {
 		return base;
 	}
 

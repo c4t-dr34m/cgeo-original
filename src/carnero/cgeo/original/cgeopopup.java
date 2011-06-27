@@ -1,5 +1,11 @@
 package carnero.cgeo.original;
 
+import carnero.cgeo.original.models.Cache;
+import carnero.cgeo.original.libs.Settings;
+import carnero.cgeo.original.libs.Base;
+import carnero.cgeo.original.libs.UpdateLoc;
+import carnero.cgeo.original.libs.Geo;
+import carnero.cgeo.original.libs.Warning;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -36,15 +42,15 @@ public class cgeopopup extends Activity {
 	private Activity activity = null;
 	private Resources res = null;
 	private cgeoapplication app = null;
-	private cgSettings settings = null;
-	private cgBase base = null;
-	private cgWarning warning = null;
+	private Settings settings = null;
+	private Base base = null;
+	private Warning warning = null;
 	private Boolean fromDetail = false;
 	private LayoutInflater inflater = null;
 	private String geocode = null;
-	private cgCache cache = null;
-	private cgGeo geo = null;
-	private cgUpdateLoc geoUpdate = new update();
+	private Cache cache = null;
+	private Geo geo = null;
+	private UpdateLoc geoUpdate = new update();
 	private ProgressDialog storeDialog = null;
 	private ProgressDialog dropDialog = null;
 	private TextView cacheDistance = null;
@@ -63,7 +69,7 @@ public class cgeopopup extends Activity {
 			} catch (Exception e) {
 				warning.showToast(res.getString(R.string.err_store));
 
-				Log.e(cgSettings.tag, "cgeopopup.storeCacheHandler: " + e.toString());
+				Log.e(Settings.tag, "cgeopopup.storeCacheHandler: " + e.toString());
 			}
 
 			if (storeDialog != null) {
@@ -86,7 +92,7 @@ public class cgeopopup extends Activity {
 			} catch (Exception e) {
 				warning.showToast(res.getString(R.string.err_drop));
 
-				Log.e(cgSettings.tag, "cgeopopup.dropCacheHandler: " + e.toString());
+				Log.e(Settings.tag, "cgeopopup.dropCacheHandler: " + e.toString());
 			}
 
 			if (dropDialog != null) {
@@ -104,9 +110,9 @@ public class cgeopopup extends Activity {
 		activity = this;
 		res = this.getResources();
 		app = (cgeoapplication) this.getApplication();
-		settings = new cgSettings(this, getSharedPreferences(cgSettings.preferences, 0));
-		base = new cgBase(app, settings, getSharedPreferences(cgSettings.preferences, 0));
-		warning = new cgWarning(this);
+		settings = new Settings(this, getSharedPreferences(Settings.preferences, 0));
+		base = new Base(app, settings, getSharedPreferences(Settings.preferences, 0));
+		warning = new Warning(this);
 
 		// set layout
 		setTheme(R.style.transparent);
@@ -115,7 +121,7 @@ public class cgeopopup extends Activity {
 
 		// google analytics
 		tracker = GoogleAnalyticsTracker.getInstance();
-		tracker.start(cgSettings.analytics, this);
+		tracker.start(Settings.analytics, this);
 		tracker.dispatch();
 		base.sendAnal(activity, tracker, "/popup");
 
@@ -227,13 +233,13 @@ public class cgeopopup extends Activity {
 			activity.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.geocaching.com/seek/cache_details.aspx?wp=" + cache.geocode)));
 			return true;
 		} else if (menuItem == 20) {
-			base.runExternalMap(cgBase.mapAppLocus, activity, res, warning, tracker, cache.latitude, cache.longitude); // locus
+			base.runExternalMap(Base.mapAppLocus, activity, res, warning, tracker, cache.latitude, cache.longitude); // locus
 			return true;
 		} else if (menuItem == 21) {
-			base.runExternalMap(cgBase.mapAppRmaps, activity, res, warning, tracker, cache.latitude, cache.longitude); // rmaps
+			base.runExternalMap(Base.mapAppRmaps, activity, res, warning, tracker, cache.latitude, cache.longitude); // rmaps
 			return true;
 		} else if (menuItem == 23) {
-			base.runExternalMap(cgBase.mapAppAny, activity, res, warning, tracker, cache.latitude, cache.longitude); // rmaps
+			base.runExternalMap(Base.mapAppAny, activity, res, warning, tracker, cache.latitude, cache.longitude); // rmaps
 			return true;
 		}
 
@@ -305,17 +311,17 @@ public class cgeopopup extends Activity {
 			itemValue = (TextView) itemLayout.findViewById(R.id.value);
 
 			itemName.setText(res.getString(R.string.cache_type));
-			if (cgBase.cacheTypesInv.containsKey(cache.type) == true) { // cache icon
+			if (Base.cacheTypesInv.containsKey(cache.type) == true) { // cache icon
 				if (cache.size != null && cache.size.length() > 0) {
-					itemValue.setText(cgBase.cacheTypesInv.get(cache.type) + " (" + cache.size + ")");
+					itemValue.setText(Base.cacheTypesInv.get(cache.type) + " (" + cache.size + ")");
 				} else {
-					itemValue.setText(cgBase.cacheTypesInv.get(cache.type));
+					itemValue.setText(Base.cacheTypesInv.get(cache.type));
 				}
 			} else {
 				if (cache.size != null && cache.size.length() > 0) {
-					itemValue.setText(cgBase.cacheTypesInv.get("mystery") + " (" + cache.size + ")");
+					itemValue.setText(Base.cacheTypesInv.get("mystery") + " (" + cache.size + ")");
 				} else {
-					itemValue.setText(cgBase.cacheTypesInv.get("mystery"));
+					itemValue.setText(Base.cacheTypesInv.get("mystery"));
 				}
 			}
 			detailsList.addView(itemLayout);
@@ -494,7 +500,7 @@ public class cgeopopup extends Activity {
 				((LinearLayout) findViewById(R.id.offline_box)).setVisibility(View.GONE);
 			}
 		} catch (Exception e) {
-			Log.e(cgSettings.tag, "cgeopopup.init: " + e.toString());
+			Log.e(Settings.tag, "cgeopopup.init: " + e.toString());
 		}
 
 		if (geo != null) {
@@ -547,21 +553,21 @@ public class cgeopopup extends Activity {
 		super.onPause();
 	}
 
-	private class update extends cgUpdateLoc {
+	private class update extends UpdateLoc {
 
 		@Override
-		public void updateLoc(cgGeo geo) {
+		public void updateLoc(Geo geo) {
 			if (geo == null) {
 				return;
 			}
 
 			try {
 				if (geo.latitudeNow != null && geo.longitudeNow != null && cache != null && cache.latitude != null && cache.longitude != null) {
-					cacheDistance.setText(base.getHumanDistance(cgBase.getDistance(geo.latitudeNow, geo.longitudeNow, cache.latitude, cache.longitude)));
+					cacheDistance.setText(base.getHumanDistance(Base.getDistance(geo.latitudeNow, geo.longitudeNow, cache.latitude, cache.longitude)));
 					cacheDistance.bringToFront();
 				}
 			} catch (Exception e) {
-				Log.w(cgSettings.tag, "Failed to update location.");
+				Log.w(Settings.tag, "Failed to update location.");
 			}
 		}
 	}
@@ -601,7 +607,7 @@ public class cgeopopup extends Activity {
 		}
 
 		try {
-			if (cgBase.isIntentAvailable(activity, "com.google.android.radar.SHOW_RADAR") == true) {
+			if (Base.isIntentAvailable(activity, "com.google.android.radar.SHOW_RADAR") == true) {
 				Intent radarIntent = new Intent("com.google.android.radar.SHOW_RADAR");
 				radarIntent.putExtra("latitude", new Float(cache.latitude));
 				radarIntent.putExtra("longitude", new Float(cache.longitude));
@@ -619,7 +625,7 @@ public class cgeopopup extends Activity {
 							dialog.cancel();
 						} catch (Exception e) {
 							warning.showToast(res.getString(R.string.err_radar_market));
-							Log.e(cgSettings.tag, "cgeopoint.radarTo.onClick: " + e.toString());
+							Log.e(Settings.tag, "cgeopoint.radarTo.onClick: " + e.toString());
 						}
 					}
 				});
@@ -635,7 +641,7 @@ public class cgeopopup extends Activity {
 			}
 		} catch (Exception e) {
 			warning.showToast(res.getString(R.string.err_radar_generic));
-			Log.e(cgSettings.tag, "cgeopoint.radarTo: " + e.toString());
+			Log.e(Settings.tag, "cgeopoint.radarTo: " + e.toString());
 		}
 	}
 

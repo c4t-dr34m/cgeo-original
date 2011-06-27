@@ -1,5 +1,15 @@
 package carnero.cgeo.original;
 
+import carnero.cgeo.original.libs.Compass;
+import carnero.cgeo.original.models.Coord;
+import carnero.cgeo.original.libs.Settings;
+import carnero.cgeo.original.libs.Base;
+import carnero.cgeo.original.libs.Direction;
+import carnero.cgeo.original.libs.UpdateLoc;
+import carnero.cgeo.original.libs.Geo;
+import carnero.cgeo.original.libs.Warning;
+import carnero.cgeo.original.libs.UpdateDir;
+
 import java.util.ArrayList;
 import android.os.Bundle;
 import android.os.Handler;
@@ -20,22 +30,20 @@ import android.view.WindowManager;
 import java.util.HashMap;
 import java.util.Locale;
 
-import carnero.cgeo.original.mapcommon.cgeomap;
-
 public class cgeonavigate extends Activity {
 
-	public static ArrayList<cgCoord> coordinates = new ArrayList<cgCoord>();
+	public static ArrayList<Coord> coordinates = new ArrayList<Coord>();
 	private Resources res = null;
 	private cgeoapplication app = null;
 	private Activity activity = null;
-	private cgSettings settings = null;
-	private cgBase base = null;
-	private cgWarning warning = null;
+	private Settings settings = null;
+	private Base base = null;
+	private Warning warning = null;
 	private PowerManager pm = null;
-	private cgGeo geo = null;
-	private cgDirection dir = null;
-	private cgUpdateLoc geoUpdate = new update();
-	private cgUpdateDir dirUpdate = new updateDir();
+	private Geo geo = null;
+	private Direction dir = null;
+	private UpdateLoc geoUpdate = new update();
+	private UpdateDir dirUpdate = new updateDir();
 	private Double dstLatitude = null;
 	private Double dstLongitude = null;
 	private Double cacheHeading = new Double(0);
@@ -48,7 +56,7 @@ public class cgeonavigate extends Activity {
 	private TextView navLocation = null;
 	private TextView distanceView = null;
 	private TextView headingView = null;
-	private cgCompass compassView = null;
+	private Compass compassView = null;
 	private updaterThread updater = null;
 	private Handler updaterHandler = new Handler() {
 
@@ -59,7 +67,7 @@ public class cgeonavigate extends Activity {
 					compassView.updateNorth(northHeading, cacheHeading);
 				}
 			} catch (Exception e) {
-				Log.e(cgSettings.tag, "cgeonavigate.updaterHandler: " + e.toString());
+				Log.e(Settings.tag, "cgeonavigate.updaterHandler: " + e.toString());
 			}
 		}
 	};
@@ -72,9 +80,9 @@ public class cgeonavigate extends Activity {
 		activity = this;
 		res = this.getResources();
 		app = (cgeoapplication) this.getApplication();
-		settings = new cgSettings(this, getSharedPreferences(cgSettings.preferences, 0));
-		base = new cgBase(app, settings, getSharedPreferences(cgSettings.preferences, 0));
-		warning = new cgWarning(this);
+		settings = new Settings(this, getSharedPreferences(Settings.preferences, 0));
+		base = new Base(app, settings, getSharedPreferences(Settings.preferences, 0));
+		warning = new Warning(this);
 
 		// set layout
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -131,7 +139,7 @@ public class cgeonavigate extends Activity {
 		setDestCoords();
 
 		// get textviews once
-		compassView = (cgCompass) findViewById(R.id.rose);
+		compassView = (Compass) findViewById(R.id.rose);
 
 		// start updater thread
 		updater = new updaterThread(updaterHandler);
@@ -229,7 +237,7 @@ public class cgeonavigate extends Activity {
 			SubMenu subMenu = menu.addSubMenu(0, 3, 0, res.getString(R.string.destination_select)).setIcon(android.R.drawable.ic_menu_myplaces);
 
 			int cnt = 4;
-			for (cgCoord coordinate : coordinates) {
+			for (Coord coordinate : coordinates) {
 				subMenu.add(0, cnt, 0, coordinate.name + " (" + coordinate.type + ")");
 				cnt++;
 			}
@@ -276,7 +284,7 @@ public class cgeonavigate extends Activity {
 					dir = app.removeDir();
 				}
 
-				SharedPreferences.Editor prefsEdit = getSharedPreferences(cgSettings.preferences, 0).edit();
+				SharedPreferences.Editor prefsEdit = getSharedPreferences(Settings.preferences, 0).edit();
 				prefsEdit.putInt("usecompass", settings.useCompass);
 				prefsEdit.commit();
 			} else {
@@ -286,7 +294,7 @@ public class cgeonavigate extends Activity {
 					dir = app.startDir(activity, dirUpdate, warning);
 				}
 
-				SharedPreferences.Editor prefsEdit = getSharedPreferences(cgSettings.preferences, 0).edit();
+				SharedPreferences.Editor prefsEdit = getSharedPreferences(Settings.preferences, 0).edit();
 				prefsEdit.putInt("usecompass", settings.useCompass);
 				prefsEdit.commit();
 			}
@@ -297,7 +305,7 @@ public class cgeonavigate extends Activity {
 			finish();
 			return true;
 		} else if (id > 3 && coordinates != null && coordinates.get(id - 4) != null) {
-			cgCoord coordinate = coordinates.get(id - 4);
+			Coord coordinate = coordinates.get(id - 4);
 
 			title = coordinate.name;
 			dstLatitude = coordinate.latitude;
@@ -306,7 +314,7 @@ public class cgeonavigate extends Activity {
 			setDestCoords();
 			updateDistanceInfo();
 
-			Log.d(cgSettings.tag, "destination set: " + title + " (" + String.format(Locale.getDefault(), "%.8f", dstLatitude) + " | " + String.format(Locale.getDefault(), "%.8f", dstLatitude) + ")");
+			Log.d(Settings.tag, "destination set: " + title + " (" + String.format(Locale.getDefault(), "%.8f", dstLatitude) + " | " + String.format(Locale.getDefault(), "%.8f", dstLatitude) + ")");
 			return true;
 		}
 
@@ -364,15 +372,15 @@ public class cgeonavigate extends Activity {
 			headingView = (TextView) findViewById(R.id.heading);
 		}
 
-		cacheHeading = cgBase.getHeading(geo.latitudeNow, geo.longitudeNow, dstLatitude, dstLongitude);
-		distanceView.setText(base.getHumanDistance(cgBase.getDistance(geo.latitudeNow, geo.longitudeNow, dstLatitude, dstLongitude)));
+		cacheHeading = Base.getHeading(geo.latitudeNow, geo.longitudeNow, dstLatitude, dstLongitude);
+		distanceView.setText(base.getHumanDistance(Base.getDistance(geo.latitudeNow, geo.longitudeNow, dstLatitude, dstLongitude)));
 		headingView.setText(String.format(Locale.getDefault(), "%.0f", cacheHeading) + "°");
 	}
 
-	private class update extends cgUpdateLoc {
+	private class update extends UpdateLoc {
 
 		@Override
-		public void updateLoc(cgGeo geo) {
+		public void updateLoc(Geo geo) {
 			if (geo == null) {
 				return;
 			}
@@ -405,7 +413,7 @@ public class cgeonavigate extends Activity {
 					}
 
 					if (geo.accuracyNow != null) {
-						if (settings.units == cgSettings.unitsImperial) {
+						if (settings.units == Settings.unitsImperial) {
 							navAccuracy.setText("±" + String.format(Locale.getDefault(), "%.0f", (geo.accuracyNow * 3.2808399)) + " ft");
 						} else {
 							navAccuracy.setText("±" + String.format(Locale.getDefault(), "%.0f", geo.accuracyNow) + " m");
@@ -416,7 +424,7 @@ public class cgeonavigate extends Activity {
 
 					if (geo.altitudeNow != null) {
 						String humanAlt;
-						if (settings.units == cgSettings.unitsImperial) {
+						if (settings.units == Settings.unitsImperial) {
 							humanAlt = String.format("%.0f", (geo.altitudeNow * 3.2808399)) + " ft";
 						} else {
 							humanAlt = String.format("%.0f", geo.altitudeNow) + " m";
@@ -441,15 +449,15 @@ public class cgeonavigate extends Activity {
 					}
 				}
 			} catch (Exception e) {
-				Log.w(cgSettings.tag, "Failed to update location.");
+				Log.w(Settings.tag, "Failed to update location.");
 			}
 		}
 	}
 
-	private class updateDir extends cgUpdateDir {
+	private class updateDir extends UpdateDir {
 
 		@Override
-		public void updateDir(cgDirection dir) {
+		public void updateDir(Direction dir) {
 			if (dir == null || dir.directionNow == null) {
 				return;
 			}

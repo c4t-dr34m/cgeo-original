@@ -1,5 +1,10 @@
 package carnero.cgeo.original;
 
+import carnero.cgeo.original.libs.Settings;
+import carnero.cgeo.original.libs.Base;
+import carnero.cgeo.original.libs.UpdateLoc;
+import carnero.cgeo.original.libs.Geo;
+import carnero.cgeo.original.libs.Warning;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -28,14 +33,14 @@ public class cgeopoint extends Activity {
 
 	private Resources res = null;
 	private cgeoapplication app = null;
-	private cgSettings settings = null;
+	private Settings settings = null;
 	private SharedPreferences prefs = null;
-	private cgBase base = null;
-	private cgWarning warning = null;
+	private Base base = null;
+	private Warning warning = null;
 	private Activity activity = null;
 	private GoogleAnalyticsTracker tracker = null;
-	private cgGeo geo = null;
-	private cgUpdateLoc geoUpdate = new update();
+	private Geo geo = null;
+	private UpdateLoc geoUpdate = new update();
 	private EditText latEdit = null;
 	private EditText lonEdit = null;
 	private boolean changed = false;
@@ -48,10 +53,10 @@ public class cgeopoint extends Activity {
 		activity = this;
 		app = (cgeoapplication) this.getApplication();
 		res = this.getResources();
-		settings = new cgSettings(activity, activity.getSharedPreferences(cgSettings.preferences, 0));
-		prefs = getSharedPreferences(cgSettings.preferences, 0);
-		base = new cgBase(app, settings, activity.getSharedPreferences(cgSettings.preferences, 0));
-		warning = new cgWarning(activity);
+		settings = new Settings(activity, activity.getSharedPreferences(Settings.preferences, 0));
+		prefs = getSharedPreferences(Settings.preferences, 0);
+		base = new Base(app, settings, activity.getSharedPreferences(Settings.preferences, 0));
+		warning = new Warning(activity);
 
 		// set layout
 		if (settings.skin == 1) {
@@ -64,7 +69,7 @@ public class cgeopoint extends Activity {
 
 		// google analytics
 		tracker = GoogleAnalyticsTracker.getInstance();
-		tracker.start(cgSettings.analytics, this);
+		tracker.start(Settings.analytics, this);
 		tracker.dispatch();
 		base.sendAnal(activity, tracker, "/point");
 
@@ -221,13 +226,13 @@ public class cgeopoint extends Activity {
 			cachesAround();
 			return true;
 		} else if (menuItem == 20) {
-			base.runExternalMap(cgBase.mapAppLocus, activity, res, warning, tracker, coords.get(0), coords.get(1)); // locus
+			base.runExternalMap(Base.mapAppLocus, activity, res, warning, tracker, coords.get(0), coords.get(1)); // locus
 			return true;
 		} else if (menuItem == 21) {
-			base.runExternalMap(cgBase.mapAppRmaps, activity, res, warning, tracker, coords.get(0), coords.get(1)); // rmaps
+			base.runExternalMap(Base.mapAppRmaps, activity, res, warning, tracker, coords.get(0), coords.get(1)); // rmaps
 			return true;
 		} else if (menuItem == 23) {
-			base.runExternalMap(cgBase.mapAppAny, activity, res, warning, tracker, coords.get(0), coords.get(1)); // rmaps
+			base.runExternalMap(Base.mapAppAny, activity, res, warning, tracker, coords.get(0), coords.get(1)); // rmaps
 			return true;
 		}
 
@@ -275,7 +280,7 @@ public class cgeopoint extends Activity {
 		}
 		
 		try {
-			if (cgBase.isIntentAvailable(activity, "com.google.android.radar.SHOW_RADAR") == true) {
+			if (Base.isIntentAvailable(activity, "com.google.android.radar.SHOW_RADAR") == true) {
 				Intent radarIntent = new Intent("com.google.android.radar.SHOW_RADAR");
 				radarIntent.putExtra("latitude", new Float(coords.get(0)));
 				radarIntent.putExtra("longitude", new Float(coords.get(1)));
@@ -293,7 +298,7 @@ public class cgeopoint extends Activity {
 							dialog.cancel();
 						} catch (Exception e) {
 							warning.showToast(res.getString(R.string.err_radar_market));
-							Log.e(cgSettings.tag, "cgeopoint.radarTo.onClick: " + e.toString());
+							Log.e(Settings.tag, "cgeopoint.radarTo.onClick: " + e.toString());
 						}
 					}
 				});
@@ -309,7 +314,7 @@ public class cgeopoint extends Activity {
 			}
 		} catch (Exception e) {
 			warning.showToast(res.getString(R.string.err_radar_generic));
-			Log.e(cgSettings.tag, "cgeopoint.radarTo: " + e.toString());
+			Log.e(Settings.tag, "cgeopoint.radarTo: " + e.toString());
 		}
 	}
 	
@@ -334,10 +339,10 @@ public class cgeopoint extends Activity {
 		finish();
 	}
 	
-	private class update extends cgUpdateLoc {
+	private class update extends UpdateLoc {
 
 		@Override
-		public void updateLoc(cgGeo geo) {
+		public void updateLoc(Geo geo) {
 			if (geo == null) {
 				return;
 			}
@@ -353,7 +358,7 @@ public class cgeopoint extends Activity {
 				latEdit.setHint(base.formatCoordinate(geo.latitudeNow, "lat", false));
 				lonEdit.setHint(base.formatCoordinate(geo.longitudeNow, "lon", false));
 			} catch (Exception e) {
-				Log.w(cgSettings.tag, "Failed to update location.");
+				Log.w(Settings.tag, "Failed to update location.");
 			}
 		}
 	}
@@ -455,7 +460,7 @@ public class cgeopoint extends Activity {
 				distance = (new Double(matcherE.group(1))) * 1.609344;
 			} else {
 				try {
-					if (settings.units == cgSettings.unitsImperial) {
+					if (settings.units == Settings.unitsImperial) {
 						distance = (new Double(distanceText)) * 0.0003048; // considering it feet
 					} else {
 						distance = (new Double(distanceText)) * 0.001; // considering it meters

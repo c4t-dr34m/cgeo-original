@@ -1,5 +1,10 @@
 package carnero.cgeo.original;
 
+import carnero.cgeo.original.libs.Settings;
+import carnero.cgeo.original.libs.Base;
+import carnero.cgeo.original.libs.UpdateLoc;
+import carnero.cgeo.original.libs.Geo;
+import carnero.cgeo.original.libs.Warning;
 import java.util.HashMap;
 import android.os.Bundle;
 import android.app.Activity;
@@ -26,11 +31,11 @@ public class cgeoadvsearch extends Activity {
 	private Resources res = null;
 	private Activity activity = null;
 	private cgeoapplication app = null;
-	private cgSettings settings = null;
-	private cgBase base = null;
-	private cgWarning warning = null;
-	private cgGeo geo = null;
-	private cgUpdateLoc geoUpdate = new update();
+	private Settings settings = null;
+	private Base base = null;
+	private Warning warning = null;
+	private Geo geo = null;
+	private UpdateLoc geoUpdate = new update();
 	private EditText latEdit = null;
 	private EditText lonEdit = null;
 	private String[] geocodesInCache = null;
@@ -44,9 +49,9 @@ public class cgeoadvsearch extends Activity {
 		res = this.getResources();
 		app = (cgeoapplication) this.getApplication();
 		app.setAction(null);
-		settings = new cgSettings(this, getSharedPreferences(cgSettings.preferences, 0));
-		base = new cgBase(app, settings, getSharedPreferences(cgSettings.preferences, 0));
-		warning = new cgWarning(this);
+		settings = new Settings(this, getSharedPreferences(Settings.preferences, 0));
+		base = new Base(app, settings, getSharedPreferences(Settings.preferences, 0));
+		warning = new Warning(this);
 
 		// search query
 		Intent intent = getIntent();
@@ -149,7 +154,7 @@ public class cgeoadvsearch extends Activity {
 				found = true;
 			}
 		} catch (Exception e) {
-			Log.w(cgSettings.tag, "cgeoadvsearch.instantSearch: " + e.toString());
+			Log.w(Settings.tag, "cgeoadvsearch.instantSearch: " + e.toString());
 		}
 
 		return found;
@@ -159,7 +164,7 @@ public class cgeoadvsearch extends Activity {
 		settings.getLogin();
 		settings.reloadCacheType();
 
-		if (settings.cacheType != null && cgBase.cacheTypesInv.containsKey(settings.cacheType) == false) {
+		if (settings.cacheType != null && Base.cacheTypesInv.containsKey(settings.cacheType) == false) {
 			settings.setCacheType(null);
 		}
 
@@ -249,10 +254,10 @@ public class cgeoadvsearch extends Activity {
 		}
 	}
 
-	private class update extends cgUpdateLoc {
+	private class update extends UpdateLoc {
 
 		@Override
-		public void updateLoc(cgGeo geo) {
+		public void updateLoc(Geo geo) {
 			if (geo == null) {
 				return;
 			}
@@ -270,7 +275,7 @@ public class cgeoadvsearch extends Activity {
 					lonEdit.setHint(base.formatCoordinate(geo.longitudeNow, "lon", false));
 				}
 			} catch (Exception e) {
-				Log.w(cgSettings.tag, "Failed to update location.");
+				Log.w(Settings.tag, "Failed to update location.");
 			}
 		}
 	}

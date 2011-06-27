@@ -1,8 +1,8 @@
 package carnero.cgeo.original.mapinterfaces;
 
 import android.content.Context;
-import carnero.cgeo.original.cgCoord;
-import carnero.cgeo.original.cgUser;
+import carnero.cgeo.original.models.Coord;
+import carnero.cgeo.original.models.User;
 
 /**
  * Defines functions of a factory class to get implementation specific objects
@@ -22,9 +22,9 @@ public interface MapFactory {
 
 	public OverlayImpl getOverlayBaseWrapper(OverlayBase ovlIn);
 
-	CacheOverlayItemImpl getCacheOverlayItem(cgCoord coordinate, String type);
+	CacheOverlayItemImpl getCacheOverlayItem(Coord coordinate, String type);
 
 	public UserOverlayItemImpl getUserOverlayItemBase(Context context,
-			cgUser userOne);
+			User userOne);
 
 }

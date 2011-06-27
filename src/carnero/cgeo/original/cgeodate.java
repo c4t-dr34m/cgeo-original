@@ -1,5 +1,9 @@
 package carnero.cgeo.original;
 
+import carnero.cgeo.original.libs.LogForm;
+import carnero.cgeo.original.libs.Settings;
+import carnero.cgeo.original.libs.Base;
+import carnero.cgeo.original.libs.Warning;
 import android.app.Activity;
 import android.os.Bundle;
 import android.app.Dialog;
@@ -10,19 +14,19 @@ import java.util.Calendar;
 
 public class cgeodate extends Dialog {
 
-	private cgSettings settings = null;
-	private cgBase base = null;
-	private cgWarning warning = null;
-	private cgLogForm parent = null;
+	private Settings settings = null;
+	private Base base = null;
+	private Warning warning = null;
+	private LogForm parent = null;
 	private Calendar date = Calendar.getInstance();
 
-	public cgeodate(Activity contextIn, cgLogForm parentIn, Calendar dateIn) {
+	public cgeodate(Activity contextIn, LogForm parentIn, Calendar dateIn) {
 		super(contextIn);
 
 		// init
-		settings = new cgSettings(contextIn, contextIn.getSharedPreferences(cgSettings.preferences, 0));
-		base = new cgBase((cgeoapplication) contextIn.getApplication(), settings, contextIn.getSharedPreferences(cgSettings.preferences, 0));
-		warning = new cgWarning(contextIn);
+		settings = new Settings(contextIn, contextIn.getSharedPreferences(Settings.preferences, 0));
+		base = new Base((cgeoapplication) contextIn.getApplication(), settings, contextIn.getSharedPreferences(Settings.preferences, 0));
+		warning = new Warning(contextIn);
 		date = dateIn;
 
 		parent = parentIn;

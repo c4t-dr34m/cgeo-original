@@ -1,5 +1,10 @@
 package carnero.cgeo.original;
 
+import carnero.cgeo.original.libs.Settings;
+import carnero.cgeo.original.libs.Base;
+import carnero.cgeo.original.libs.UpdateLoc;
+import carnero.cgeo.original.libs.Geo;
+import carnero.cgeo.original.libs.Warning;
 import android.os.Bundle;
 import android.os.Handler;
 import android.app.Activity;
@@ -35,13 +40,13 @@ public class cgeo extends Activity {
 	private Resources res = null;
 	private cgeoapplication app = null;
 	private Context context = null;
-	private cgSettings settings = null;
+	private Settings settings = null;
 	private SharedPreferences prefs = null;
-	private cgBase base = null;
-	private cgWarning warning = null;
+	private Base base = null;
+	private Warning warning = null;
 	private Integer version = null;
-	private cgGeo geo = null;
-	private cgUpdateLoc geoUpdate = new update();
+	private Geo geo = null;
+	private UpdateLoc geoUpdate = new update();
 	private TextView navType = null;
 	private TextView navAccuracy = null;
 	private TextView navSatellites = null;
@@ -72,7 +77,7 @@ public class cgeo extends Activity {
 					countBubble.setVisibility(View.VISIBLE);
 				}
 			} catch (Exception e) {
-				Log.w(cgSettings.tag, "cgeo.countBubbleHander: " + e.toString());
+				Log.w(Settings.tag, "cgeo.countBubbleHander: " + e.toString());
 			}
 		}
 	};
@@ -125,10 +130,10 @@ public class cgeo extends Activity {
 		res = this.getResources();
 		app = (cgeoapplication) this.getApplication();
 		app.setAction(null);
-		settings = new cgSettings(this, getSharedPreferences(cgSettings.preferences, 0));
-		prefs = getSharedPreferences(cgSettings.preferences, 0);
-		base = new cgBase(app, settings, getSharedPreferences(cgSettings.preferences, 0));
-		warning = new cgWarning(this);
+		settings = new Settings(this, getSharedPreferences(Settings.preferences, 0));
+		prefs = getSharedPreferences(Settings.preferences, 0);
+		base = new Base(app, settings, getSharedPreferences(Settings.preferences, 0));
+		warning = new Warning(this);
 
 		app.cleanGeo();
 		app.cleanDir();
@@ -143,13 +148,13 @@ public class cgeo extends Activity {
 			version = info.versionCode;
 
 			base.sendAnal(context, "/?ver=" + info.versionCode);
-			Log.i(cgSettings.tag, "Starting " + info.packageName + " " + info.versionCode + " a.k.a " + info.versionName + "...");
+			Log.i(Settings.tag, "Starting " + info.packageName + " " + info.versionCode + " a.k.a " + info.versionName + "...");
 
 			info = null;
 			manager = null;
 		} catch (Exception e) {
 			base.sendAnal(context, "/");
-			Log.i(cgSettings.tag, "No info.");
+			Log.i(Settings.tag, "No info.");
 		}
 
 		init();
@@ -263,7 +268,7 @@ public class cgeo extends Activity {
 		boolean foundItem = false;
 		int itemCount = menu.size();
 		if (settings.cacheType != null) {
-			String typeTitle = cgBase.cacheTypesInv.get(settings.cacheType);
+			String typeTitle = Base.cacheTypesInv.get(settings.cacheType);
 			if (typeTitle != null) {
 				for (int i = 0; i < itemCount; i++) {
 					if (menu.getItem(i).getTitle().equals(typeTitle)) {
@@ -291,7 +296,7 @@ public class cgeo extends Activity {
 		} else if (id > 0) {
 			String itemTitle = item.getTitle().toString();
 			String choice = null;
-			for (Entry<String, String> entry : cgBase.cacheTypesInv.entrySet()) {
+			for (Entry<String, String> entry : Base.cacheTypesInv.entrySet()) {
 				if (entry.getValue().equalsIgnoreCase(itemTitle)) {
 					choice = entry.getKey();
 					break;
@@ -315,7 +320,7 @@ public class cgeo extends Activity {
 			filterTitle = (TextView) findViewById(R.id.filter_button_title);
 		}
 		if (settings.cacheType != null) {
-			filterTitle.setText(cgBase.cacheTypesInv.get(settings.cacheType));
+			filterTitle.setText(Base.cacheTypesInv.get(settings.cacheType));
 		} else {
 			filterTitle.setText(res.getString(R.string.all));
 		}
@@ -348,7 +353,7 @@ public class cgeo extends Activity {
 		(new countBubbleUpdate()).start();
 		(new cleanDatabase()).start();
 
-		if (settings.cacheType != null && cgBase.cacheTypesInv.containsKey(settings.cacheType) == false) {
+		if (settings.cacheType != null && Base.cacheTypesInv.containsKey(settings.cacheType) == false) {
 			settings.setCacheType(null);
 		}
 
@@ -391,10 +396,10 @@ public class cgeo extends Activity {
 		setFilterTitle();
 	}
 
-	private class update extends cgUpdateLoc {
+	private class update extends UpdateLoc {
 
 		@Override
-		public void updateLoc(cgGeo geo) {
+		public void updateLoc(Geo geo) {
 			if (geo == null) {
 				return;
 			}
@@ -431,7 +436,7 @@ public class cgeo extends Activity {
 					}
 
 					if (geo.accuracyNow != null) {
-						if (settings.units == cgSettings.unitsImperial) {
+						if (settings.units == Settings.unitsImperial) {
 							navAccuracy.setText("±" + String.format(Locale.getDefault(), "%.0f", (geo.accuracyNow * 3.2808399)) + " ft");
 						} else {
 							navAccuracy.setText("±" + String.format(Locale.getDefault(), "%.0f", geo.accuracyNow) + " m");
@@ -444,13 +449,13 @@ public class cgeo extends Activity {
 						if (addLat == null || addLon == null) {
 							navLocation.setText(res.getString(R.string.loc_no_addr));
 						}
-						if (addLat == null || addLon == null || (cgBase.getDistance(geo.latitudeNow, geo.longitudeNow, addLat, addLon) > 0.5 && addressObtaining == false)) {
+						if (addLat == null || addLon == null || (Base.getDistance(geo.latitudeNow, geo.longitudeNow, addLat, addLon) > 0.5 && addressObtaining == false)) {
 							(new obtainAddress()).start();
 						}
 					} else {
 						if (geo.altitudeNow != null) {
 							String humanAlt;
-							if (settings.units == cgSettings.unitsImperial) {
+							if (settings.units == Settings.unitsImperial) {
 								humanAlt = String.format("%.0f", (geo.altitudeNow * 3.2808399)) + " ft";
 							} else {
 								humanAlt = String.format("%.0f", geo.altitudeNow) + " m";
@@ -470,7 +475,7 @@ public class cgeo extends Activity {
 					navLocation.setText(res.getString(R.string.loc_trying));
 				}
 			} catch (Exception e) {
-				Log.w(cgSettings.tag, "Failed to update location.");
+				Log.w(Settings.tag, "Failed to update location.");
 			}
 		}
 	}
@@ -563,7 +568,7 @@ public class cgeo extends Activity {
 
 			boolean more = false;
 			if (version != settings.version) {
-				Log.i(cgSettings.tag, "Initializing hard cleanup - version changed from " + settings.version + " to " + version + ".");
+				Log.i(Settings.tag, "Initializing hard cleanup - version changed from " + settings.version + " to " + version + ".");
 
 				more = true;
 			}
@@ -601,7 +606,7 @@ public class cgeo extends Activity {
 
 				addresses = geocoder.getFromLocation(geo.latitudeNow, geo.longitudeNow, 1);
 			} catch (Exception e) {
-				Log.i(cgSettings.tag, "Failed to obtain address");
+				Log.i(Settings.tag, "Failed to obtain address");
 			}
 
 			obtainAddressHandler.sendEmptyMessage(0);

@@ -1,5 +1,12 @@
 package carnero.cgeo.original;
 
+import carnero.cgeo.original.models.Cache;
+import carnero.cgeo.original.libs.LogForm;
+import carnero.cgeo.original.libs.Settings;
+import carnero.cgeo.original.libs.Base;
+import carnero.cgeo.original.models.TrackableLog;
+import carnero.cgeo.original.models.CacheLog;
+import carnero.cgeo.original.libs.Warning;
 import android.os.Bundle;
 import android.app.Activity;
 import android.app.Dialog;
@@ -26,15 +33,15 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 
-public class cgeovisit extends cgLogForm {
+public class cgeovisit extends LogForm {
 	private cgeoapplication app = null;
 	private Activity activity = null;
 	private Resources res = null;
 	private LayoutInflater inflater = null;
-	private cgBase base = null;
-	private cgSettings settings = null;
-	private cgWarning warning = null;
-	private cgCache cache = null;
+	private Base base = null;
+	private Settings settings = null;
+	private Warning warning = null;
+	private Cache cache = null;
 	private ArrayList<Integer> types = new ArrayList<Integer>();
 	private ProgressDialog waitDialog = null;
 	private String cacheid = null;
@@ -44,7 +51,7 @@ public class cgeovisit extends cgLogForm {
 	private String viewstate = null;
 	private String viewstate1 = null;
 	private Boolean gettingViewstate = true;
-	private ArrayList<cgTrackableLog> trackables = null;
+	private ArrayList<TrackableLog> trackables = null;
 	private Calendar date = Calendar.getInstance();
 	private int typeSelected = 1;
 	private int attempts = 0;
@@ -111,12 +118,12 @@ public class cgeovisit extends cgLogForm {
 				final LinearLayout inventoryView = (LinearLayout) findViewById(R.id.inventory);
 				inventoryView.removeAllViews();
 
-				for (cgTrackableLog tb : trackables) {
+				for (TrackableLog tb : trackables) {
 					LinearLayout inventoryItem = (LinearLayout) inflater.inflate(R.layout.visit_trackable, null);
 
 					((TextView) inventoryItem.findViewById(R.id.trackcode)).setText(tb.trackCode);
 					((TextView) inventoryItem.findViewById(R.id.name)).setText(tb.name);
-					((TextView) inventoryItem.findViewById(R.id.action)).setText(cgBase.logTypesTrackable.get(0));
+					((TextView) inventoryItem.findViewById(R.id.action)).setText(Base.logTypesTrackable.get(0));
 
 					inventoryItem.setId(tb.id);
 					final String tbCode = tb.trackCode;
@@ -194,8 +201,8 @@ public class cgeovisit extends cgLogForm {
 					warning.showToast(res.getString(R.string.err_log_post_failed));
 				}
 			} else {
-				if (cgBase.errorRetrieve.get(msg.what) != null) {
-					warning.showToast(res.getString(R.string.err_log_post_failed_because) + " " + cgBase.errorRetrieve.get(msg.what) + ".");
+				if (Base.errorRetrieve.get(msg.what) != null) {
+					warning.showToast(res.getString(R.string.err_log_post_failed_because) + " " + Base.errorRetrieve.get(msg.what) + ".");
 				} else {
 					warning.showToast(res.getString(R.string.err_log_post_failed));
 				}
@@ -215,9 +222,9 @@ public class cgeovisit extends cgLogForm {
 		activity = this;
 		res = this.getResources();
 		app = (cgeoapplication) this.getApplication();
-		settings = new cgSettings(this, getSharedPreferences(cgSettings.preferences, 0));
-		base = new cgBase(app, settings, getSharedPreferences(cgSettings.preferences, 0));
-		warning = new cgWarning(this);
+		settings = new Settings(this, getSharedPreferences(Settings.preferences, 0));
+		base = new Base(app, settings, getSharedPreferences(Settings.preferences, 0));
+		warning = new Warning(this);
 
 		// set layout
 		if (settings.skin == 1) {
@@ -330,8 +337,8 @@ public class cgeovisit extends cgLogForm {
 
 		text = (EditText) findViewById(R.id.log);
 		textContent = text.getText().toString();
-		dateString = cgBase.dateOut.format(new Date());
-		timeString = cgBase.timeOut.format(new Date());
+		dateString = Base.dateOut.format(new Date());
+		timeString = Base.timeOut.format(new Date());
 
 		if ((id & LOG_DATE) == LOG_DATE) {
 			addText.append(dateString);
@@ -387,26 +394,26 @@ public class cgeovisit extends cgLogForm {
 
 		if (viewId == R.id.type) {
 			for (final int typeOne : types) {
-				menu.add(viewId, typeOne, 0, cgBase.logTypes2.get(typeOne));
-				Log.w(cgSettings.tag, "Addig " + typeOne + " " + cgBase.logTypes2.get(typeOne));
+				menu.add(viewId, typeOne, 0, Base.logTypes2.get(typeOne));
+				Log.w(Settings.tag, "Addig " + typeOne + " " + Base.logTypes2.get(typeOne));
 			}
 		} else if (viewId == R.id.changebutton) {
 			final int textId = ((TextView) findViewById(viewId)).getId();
 
 			menu.setHeaderTitle(res.getString(R.string.log_tb_changeall));
-			for (final int logTbAction : cgBase.logTypesTrackable.keySet()) {
-				menu.add(textId, logTbAction, 0, cgBase.logTypesTrackable.get(logTbAction));
+			for (final int logTbAction : Base.logTypesTrackable.keySet()) {
+				menu.add(textId, logTbAction, 0, Base.logTypesTrackable.get(logTbAction));
 			}
 		} else {
 			final int realViewId = ((LinearLayout) findViewById(viewId)).getId();
 
-			for (final cgTrackableLog tb : trackables) {
+			for (final TrackableLog tb : trackables) {
 				if (tb.id == realViewId) {
 					menu.setHeaderTitle(tb.name);
 				}
 			}
-			for (final int logTbAction : cgBase.logTypesTrackable.keySet()) {
-				menu.add(realViewId, logTbAction, 0, cgBase.logTypesTrackable.get(logTbAction));
+			for (final int logTbAction : Base.logTypesTrackable.keySet()) {
+				menu.add(realViewId, logTbAction, 0, Base.logTypesTrackable.get(logTbAction));
 			}
 		}
 	}
@@ -422,7 +429,7 @@ public class cgeovisit extends cgLogForm {
 			return true;
 		} else if (group == R.id.changebutton) {
 			try {
-				final String logTbAction = cgBase.logTypesTrackable.get(id);
+				final String logTbAction = Base.logTypesTrackable.get(id);
 				if (logTbAction != null) {
 					final LinearLayout inventView = (LinearLayout) findViewById(R.id.inventory);
 					for (int count = 0; count < inventView.getChildCount(); count++) {
@@ -437,18 +444,18 @@ public class cgeovisit extends cgLogForm {
 						}
 						tbText.setText(logTbAction);
 					}
-					for (cgTrackableLog tb : trackables) {
+					for (TrackableLog tb : trackables) {
 						tb.action = id;
 					}
 					tbChanged = true;
 					return true;
 				}
 			} catch (Exception e) {
-				Log.e(cgSettings.tag, "cgeovisit.onContextItemSelected: " + e.toString());
+				Log.e(Settings.tag, "cgeovisit.onContextItemSelected: " + e.toString());
 			}
 		} else {
 			try {
-				final String logTbAction = cgBase.logTypesTrackable.get(id);
+				final String logTbAction = Base.logTypesTrackable.get(id);
 				if (logTbAction != null) {
 					final LinearLayout tbView = (LinearLayout) findViewById(group);
 					if (tbView == null) {
@@ -460,21 +467,21 @@ public class cgeovisit extends cgLogForm {
 						return false;
 					}
 
-					for (cgTrackableLog tb : trackables) {
+					for (TrackableLog tb : trackables) {
 						if (tb.id == group) {
 							tbChanged = true;
 
 							tb.action = id;
 							tbText.setText(logTbAction);
 
-							Log.i(cgSettings.tag, "Trackable " + tb.trackCode + " (" + tb.name + ") has new action: #" + id);
+							Log.i(Settings.tag, "Trackable " + tb.trackCode + " (" + tb.name + ") has new action: #" + id);
 						}
 					}
 
 					return true;
 				}
 			} catch (Exception e) {
-				Log.e(cgSettings.tag, "cgeovisit.onContextItemSelected: " + e.toString());
+				Log.e(Settings.tag, "cgeovisit.onContextItemSelected: " + e.toString());
 			}
 		}
 
@@ -489,41 +496,41 @@ public class cgeovisit extends cgLogForm {
 		types.clear();
 
 		if (cache.type.equals("event") || cache.type.equals("mega") || cache.type.equals("cito") || cache.type.equals("lostfound")) {
-			types.add(cgBase.LOG_WILL_ATTEND);
-			types.add(cgBase.LOG_NOTE);
-			types.add(cgBase.LOG_ATTENDED);
-			types.add(cgBase.LOG_NEEDS_ARCHIVE);
+			types.add(Base.LOG_WILL_ATTEND);
+			types.add(Base.LOG_NOTE);
+			types.add(Base.LOG_ATTENDED);
+			types.add(Base.LOG_NEEDS_ARCHIVE);
 		} else if (cache.type.equals("earth")) {
-			types.add(cgBase.LOG_FOUND_IT);
-			types.add(cgBase.LOG_DIDNT_FIND_IT);
-			types.add(cgBase.LOG_NOTE);
-			types.add(cgBase.LOG_NEEDS_MAINTENANCE);
-			types.add(cgBase.LOG_NEEDS_ARCHIVE);
+			types.add(Base.LOG_FOUND_IT);
+			types.add(Base.LOG_DIDNT_FIND_IT);
+			types.add(Base.LOG_NOTE);
+			types.add(Base.LOG_NEEDS_MAINTENANCE);
+			types.add(Base.LOG_NEEDS_ARCHIVE);
 		} else if (cache.type.equals("webcam")) {
-			types.add(cgBase.LOG_WEBCAM_PHOTO_TAKEN);
-			types.add(cgBase.LOG_DIDNT_FIND_IT);
-			types.add(cgBase.LOG_NOTE);
-			types.add(cgBase.LOG_NEEDS_ARCHIVE);
-			types.add(cgBase.LOG_NEEDS_MAINTENANCE);
+			types.add(Base.LOG_WEBCAM_PHOTO_TAKEN);
+			types.add(Base.LOG_DIDNT_FIND_IT);
+			types.add(Base.LOG_NOTE);
+			types.add(Base.LOG_NEEDS_ARCHIVE);
+			types.add(Base.LOG_NEEDS_MAINTENANCE);
 		} else {
-			types.add(cgBase.LOG_FOUND_IT);
-			types.add(cgBase.LOG_DIDNT_FIND_IT);
-			types.add(cgBase.LOG_NOTE);
-			types.add(cgBase.LOG_NEEDS_ARCHIVE);
-			types.add(cgBase.LOG_NEEDS_MAINTENANCE);
+			types.add(Base.LOG_FOUND_IT);
+			types.add(Base.LOG_DIDNT_FIND_IT);
+			types.add(Base.LOG_NOTE);
+			types.add(Base.LOG_NEEDS_ARCHIVE);
+			types.add(Base.LOG_NEEDS_MAINTENANCE);
 		}
 		if (cache.owner.equalsIgnoreCase(settings.getUsername()) == true) {
-			types.add(cgBase.LOG_OWNER_MAINTENANCE);
-			types.add(cgBase.LOG_TEMP_DISABLE_LISTING);
-			types.add(cgBase.LOG_ENABLE_LISTING);
-			types.add(cgBase.LOG_ARCHIVE);
-			types.remove(new Integer(cgBase.LOG_UPDATE_COORDINATES));
+			types.add(Base.LOG_OWNER_MAINTENANCE);
+			types.add(Base.LOG_TEMP_DISABLE_LISTING);
+			types.add(Base.LOG_ENABLE_LISTING);
+			types.add(Base.LOG_ARCHIVE);
+			types.remove(new Integer(Base.LOG_UPDATE_COORDINATES));
 			if (cache.type.equals("event") || cache.type.equals("mega") || cache.type.equals("cito") || cache.type.equals("lostfound")) {
-				types.add(cgBase.LOG_ANNOUNCEMENT);
+				types.add(Base.LOG_ANNOUNCEMENT);
 			}
 		}
 
-		final cgLog log = app.loadLogOffline(geocode);
+		final CacheLog log = app.loadLogOffline(geocode);
 		if (log != null) {
 			typeSelected = log.type;
 			date.setTime(new Date(log.date));
@@ -534,7 +541,7 @@ public class cgeovisit extends cgLogForm {
 
 		if (types.contains(typeSelected) == false) {
 			if (alreadyFound == true) {
-				typeSelected = cgBase.LOG_NOTE;
+				typeSelected = Base.LOG_NOTE;
 			} else {
 				typeSelected = types.get(0);
 			}
@@ -543,7 +550,7 @@ public class cgeovisit extends cgLogForm {
 
 		Button typeButton = (Button) findViewById(R.id.type);
 		registerForContextMenu(typeButton);
-		typeButton.setText(cgBase.logTypes2.get(typeSelected));
+		typeButton.setText(Base.logTypes2.get(typeSelected));
 		typeButton.setOnClickListener(new View.OnClickListener() {
 
 			public void onClick(View view) {
@@ -552,7 +559,7 @@ public class cgeovisit extends cgLogForm {
 		});
 
 		Button dateButton = (Button) findViewById(R.id.date);
-		dateButton.setText(cgBase.dateOutShort.format(date.getTime()));
+		dateButton.setText(Base.dateOutShort.format(date.getTime()));
 		dateButton.setOnClickListener(new cgeovisitDateListener());
 
 		EditText logView = (EditText) findViewById(R.id.log);
@@ -592,19 +599,19 @@ public class cgeovisit extends cgLogForm {
 		date = dateIn;
 
 		final Button dateButton = (Button) findViewById(R.id.date);
-		dateButton.setText(cgBase.dateOutShort.format(date.getTime()));
+		dateButton.setText(Base.dateOutShort.format(date.getTime()));
 	}
 
 	public void setType(int type) {
 		final Button typeButton = (Button) findViewById(R.id.type);
 
-		if (cgBase.logTypes2.get(type) != null) {
+		if (Base.logTypes2.get(type) != null) {
 			typeSelected = type;
 		}
-		if (cgBase.logTypes2.get(typeSelected) == null) {
+		if (Base.logTypes2.get(typeSelected) == null) {
 			typeSelected = 1;
 		}
-		typeButton.setText(cgBase.logTypes2.get(typeSelected));
+		typeButton.setText(Base.logTypes2.get(typeSelected));
 
 		if (type == 2 && tbChanged == false) {
 			// TODO: change action
@@ -667,7 +674,7 @@ public class cgeovisit extends cgLogForm {
 			app.clearLogOffline(geocode);
 
 			if (alreadyFound == true) {
-				typeSelected = cgBase.LOG_NOTE;
+				typeSelected = Base.LOG_NOTE;
 			} else {
 				typeSelected = types.get(0);
 			}
@@ -677,7 +684,7 @@ public class cgeovisit extends cgLogForm {
 			setType(typeSelected);
 
 			Button dateButton = (Button) findViewById(R.id.date);
-			dateButton.setText(cgBase.dateOutShort.format(date.getTime()));
+			dateButton.setText(Base.dateOutShort.format(date.getTime()));
 			dateButton.setOnClickListener(new cgeovisitDateListener());
 
 			EditText logView = (EditText) findViewById(R.id.log);
@@ -737,11 +744,11 @@ public class cgeovisit extends cgLogForm {
 				if (typesPre.size() > 0) {
 					types.clear();
 					types.addAll(typesPre);
-					types.remove(new Integer(cgBase.LOG_UPDATE_COORDINATES));
+					types.remove(new Integer(Base.LOG_UPDATE_COORDINATES));
 				}
 				typesPre.clear();
 			} catch (Exception e) {
-				Log.e(cgSettings.tag, "cgeovisit.loadData.run: " + e.toString());
+				Log.e(Settings.tag, "cgeovisit.loadData.run: " + e.toString());
 			}
 
 			loadDataHandler.sendEmptyMessage(0);
@@ -775,7 +782,7 @@ public class cgeovisit extends cgLogForm {
 			status = base.postLog(app, geocode, cacheid, viewstate, viewstate1, typeSelected, date.get(Calendar.YEAR), (date.get(Calendar.MONTH) + 1), date.get(Calendar.DATE), log, trackables);
 
 			if (status == 1) {
-				cgLog logNow = new cgLog();
+				CacheLog logNow = new CacheLog();
 				logNow.author = settings.getUsername();
 				logNow.date = date.getTimeInMillis();
 				logNow.type = typeSelected;
@@ -784,7 +791,7 @@ public class cgeovisit extends cgLogForm {
 				cache.logs.add(0, logNow);
 				app.addLog(geocode, logNow);
 
-				if (typeSelected == cgBase.LOG_FOUND_IT) {
+				if (typeSelected == Base.LOG_FOUND_IT) {
 					app.markFound(geocode);
 					if (cache != null) {
 						cache.found = true;
@@ -804,7 +811,7 @@ public class cgeovisit extends cgLogForm {
 
 			return status;
 		} catch (Exception e) {
-			Log.e(cgSettings.tag, "cgeovisit.postLogFn: " + e.toString());
+			Log.e(Settings.tag, "cgeovisit.postLogFn: " + e.toString());
 		}
 
 		return 1000;

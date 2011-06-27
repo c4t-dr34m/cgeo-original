@@ -7,8 +7,8 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
-import carnero.cgeo.original.cgSettings;
-import carnero.cgeo.original.mapcommon.cgMapOverlay;
+import carnero.cgeo.original.libs.Settings;
+import carnero.cgeo.original.mapcommon.MapOverlay;
 import carnero.cgeo.original.mapinterfaces.ItemizedOverlayImpl;
 import carnero.cgeo.original.mapinterfaces.MapProjectionImpl;
 import carnero.cgeo.original.mapinterfaces.MapViewImpl;
@@ -16,15 +16,15 @@ import carnero.cgeo.original.mapinterfaces.MapViewImpl;
 
 public class mfCacheOverlay extends ItemizedOverlay<mfCacheOverlayItem> implements ItemizedOverlayImpl {
 
-	private cgMapOverlay base;
+	private MapOverlay base;
 
-	public mfCacheOverlay(cgSettings settingsIn, Context contextIn, Drawable markerIn, Boolean fromDetailIn) {
+	public mfCacheOverlay(Settings settingsIn, Context contextIn, Drawable markerIn, Boolean fromDetailIn) {
 		super(boundCenterBottom(markerIn));
-		base = new cgMapOverlay(settingsIn, this, contextIn, fromDetailIn);
+		base = new MapOverlay(settingsIn, this, contextIn, fromDetailIn);
 	}
 	
 	@Override
-	public cgMapOverlay getBase() {
+	public MapOverlay getBase() {
 		return base;
 	}
 

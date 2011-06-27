@@ -1,6 +1,6 @@
 package carnero.cgeo.original.mapinterfaces;
 
-import carnero.cgeo.original.cgCoord;
+import carnero.cgeo.original.models.Coord;
 
 /**
  * Covers the common functions of the provider-specific
@@ -10,7 +10,7 @@ import carnero.cgeo.original.cgCoord;
  */
 public interface CacheOverlayItemImpl extends OverlayItemImpl {
 
-	public cgCoord getCoord();
+	public Coord getCoord();
 	
 	public String getType();
 

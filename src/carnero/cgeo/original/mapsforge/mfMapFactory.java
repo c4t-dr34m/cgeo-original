@@ -2,8 +2,8 @@ package carnero.cgeo.original.mapsforge;
 
 import android.content.Context;
 import carnero.cgeo.original.R;
-import carnero.cgeo.original.cgCoord;
-import carnero.cgeo.original.cgUser;
+import carnero.cgeo.original.models.Coord;
+import carnero.cgeo.original.models.User;
 import carnero.cgeo.original.mapinterfaces.CacheOverlayItemImpl;
 import carnero.cgeo.original.mapinterfaces.GeoPointImpl;
 import carnero.cgeo.original.mapinterfaces.MapFactory;
@@ -40,13 +40,13 @@ public class mfMapFactory implements MapFactory{
 	}
 	
 	@Override
-	public CacheOverlayItemImpl getCacheOverlayItem(cgCoord coordinate, String type) {
+	public CacheOverlayItemImpl getCacheOverlayItem(Coord coordinate, String type) {
 		mfCacheOverlayItem baseItem = new mfCacheOverlayItem(coordinate, type);
 		return baseItem;
 	}
 
 	@Override
-	public UserOverlayItemImpl getUserOverlayItemBase(Context context, cgUser userOne) {
+	public UserOverlayItemImpl getUserOverlayItemBase(Context context, User userOne) {
 		mfUsersOverlayItem baseItem = new mfUsersOverlayItem(context, userOne);
 		return baseItem;
 	}
