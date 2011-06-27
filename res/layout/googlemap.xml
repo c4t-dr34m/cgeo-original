@@ -11,9 +11,6 @@
 		<TextView style="@style/action_bar_title" />
 		<ProgressBar style="@style/action_bar_progress"
 				android:visibility="gone" />
-		<ImageView style="@style/action_bar_action"
-				android:src="@drawable/actionbar_manual"
-				android:onClick="goManual" />
 	</LinearLayout>
 	<RelativeLayout
 			android:layout_width="fill_parent"
@@ -33,7 +30,7 @@
 				android:textSize="12dip"
 				android:textColor="@color/text_icon"
 				android:background="@drawable/icon_bcg" />
-		<view class="carnero.cgeo.googlemaps.googleMapView" android:id="@+id/map"
+		<view class="carnero.cgeo.original.googlemaps.googleMapView" android:id="@+id/map"
 				android:layout_width="fill_parent"
 				android:layout_height="fill_parent"
 				android:keepScreenOn="true"

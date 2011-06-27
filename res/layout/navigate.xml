@@ -9,9 +9,6 @@
 				android:onClick="goHome" />
 		<View style="@style/action_bar_separator" />
 		<TextView style="@style/action_bar_title" />
-		<ImageView style="@style/action_bar_action"
-				android:src="@drawable/actionbar_manual"
-				android:onClick="goManual" />
 	</LinearLayout>
 	<RelativeLayout
 			android:layout_width="fill_parent"
@@ -47,7 +44,7 @@
 				android:textSize="26dip"
 				android:textColor="?text_color"
 				android:text="@null" />
-		<view class="carnero.cgeo.cgCompass"
+		<view class="carnero.cgeo.original.cgCompass"
 				android:id="@+id/rose"
 				android:layout_width="fill_parent"
 				android:layout_height="295dip"

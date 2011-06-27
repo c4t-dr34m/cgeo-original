@@ -11,9 +11,6 @@
 		<TextView style="@style/action_bar_title" />
 		<ProgressBar style="@style/action_bar_progress"
 				android:visibility="gone" />
-		<ImageView style="@style/action_bar_action"
-				android:src="@drawable/actionbar_manual"
-				android:onClick="goManual" />
 	</LinearLayout>
 	<ScrollView
 			android:layout_width="fill_parent"
@@ -51,31 +48,6 @@
 						android:singleLine="false"
 						android:lines="5"
 						android:capitalize="sentences" />
-				<LinearLayout android:id="@+id/tweet_box"
-						android:layout_width="fill_parent"
-						android:layout_height="wrap_content"
-						android:orientation="horizontal"
-						android:layout_marginLeft="10dip"
-						android:layout_marginRight="10dip"
-						android:layout_marginBottom="5dip"
-						android:visibility="gone" >
-					<CheckBox android:id="@+id/tweet"
-							android:layout_width="wrap_content"
-							android:layout_height="wrap_content"
-							android:layout_alignParentLeft="true"
-							android:layout_gravity="left"
-							android:padding="1px"
-							android:gravity="center" />
-					<TextView
-							android:layout_width="wrap_content"
-							android:layout_height="wrap_content"
-							android:layout_gravity="center_vertical"
-							android:gravity="left"
-							android:paddingRight="3dip"
-							android:textSize="14dip"
-							android:textColor="?text_color"
-							android:text="@string/visit_tweet" />
-				</LinearLayout>
 				<Button style="@style/button"
 						android:id="@+id/post"
 						android:text="@string/log_post" />

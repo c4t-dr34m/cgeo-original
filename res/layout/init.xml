@@ -9,9 +9,6 @@
 				android:onClick="goHome" />
 		<View style="@style/action_bar_separator" />
 		<TextView style="@style/action_bar_title" />
-		<ImageView style="@style/action_bar_action"
-				android:src="@drawable/actionbar_manual"
-				android:onClick="goManual" />
 	</LinearLayout>
 	<ScrollView
 			android:layout_width="fill_parent"
@@ -57,32 +54,8 @@
 			<RelativeLayout style="@style/separator_horizontal_layout" >
 				<View style="@style/separator_horizontal" />
 				<TextView style="@style/separator_horizontal_headline"
-						android:text="@string/init_gcvote" />
-			</RelativeLayout>
-			<EditText style="@style/edittext"
-					android:id="@+id/passvote"
-					android:hint="@string/init_passvote"
-					android:password="true" />
-<!-- ** -->
-			<RelativeLayout style="@style/separator_horizontal_layout" >
-				<View style="@style/separator_horizontal" />
-				<TextView style="@style/separator_horizontal_headline"
 						android:text="@string/init_go4cache" />
 			</RelativeLayout>
-			<TextView android:id="@+id/about_go4cache"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:layout_marginLeft="10dip"
-					android:layout_marginRight="10dip"
-					android:layout_marginBottom="5dip"
-					android:layout_alignParentLeft="true"
-					android:layout_gravity="left"
-					android:padding="3dip"
-					android:textSize="14dip"
-					android:textColor="?text_color"
-					android:textColorLink="?text_color_link"
-					android:linksClickable="true"
-					android:text="@string/about_go4cache" />
 			<LinearLayout
 					android:layout_width="fill_parent"
 					android:layout_height="wrap_content"
@@ -105,52 +78,6 @@
 						android:textSize="14dip"
 						android:textColor="?text_color"
 						android:text="@string/init_go4cache_connect" />
-			</LinearLayout>
-<!-- ** -->
-			<RelativeLayout style="@style/separator_horizontal_layout" >
-				<View style="@style/separator_horizontal" />
-				<TextView style="@style/separator_horizontal_headline"
-						android:text="@string/init_twitter" />
-			</RelativeLayout>
-			<TextView android:id="@+id/about_twitter"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:layout_marginLeft="10dip"
-					android:layout_marginRight="10dip"
-					android:layout_marginBottom="5dip"
-					android:layout_alignParentLeft="true"
-					android:layout_gravity="left"
-					android:padding="3dip"
-					android:textSize="14dip"
-					android:textColor="?text_color"
-					android:textColorLink="?text_color_link"
-					android:linksClickable="true"
-					android:text="@string/about_twitter" />
-			<Button style="@style/button"
-					android:id="@+id/authorize_twitter"
-					android:text="@string/init_twitter_authorize" />
-			<LinearLayout
-					android:layout_width="fill_parent"
-					android:layout_height="wrap_content"
-					android:layout_margin="3dip"
-					android:orientation="horizontal"
-					android:padding="3dip" >
-				<CheckBox android:id="@+id/twitter_option"
-						android:layout_width="wrap_content"
-						android:layout_height="wrap_content"
-						android:layout_alignParentLeft="true"
-						android:layout_gravity="left"
-						android:padding="1px"
-						android:gravity="center" />
-				<TextView
-						android:layout_width="fill_parent"
-						android:layout_height="wrap_content"
-						android:layout_gravity="center_vertical"
-						android:gravity="left"
-						android:paddingRight="3dip"
-						android:textSize="14dip"
-						android:textColor="?text_color"
-						android:text="@string/init_twitter_publish" />
 			</LinearLayout>
 <!-- ** -->
 			<RelativeLayout style="@style/separator_horizontal_layout" >
@@ -385,27 +312,6 @@
 						android:layout_width="fill_parent"
 						android:layout_height="wrap_content"
 						android:orientation="horizontal" >
-					<CheckBox android:id="@+id/autoload"
-							android:layout_width="wrap_content"
-							android:layout_height="wrap_content"
-							android:layout_alignParentLeft="true"
-							android:layout_gravity="left"
-							android:padding="1px"
-							android:gravity="center" />
-					<TextView
-							android:layout_width="wrap_content"
-							android:layout_height="wrap_content"
-							android:layout_gravity="center_vertical"
-							android:gravity="left"
-							android:paddingRight="3dip"
-							android:textSize="14dip"
-							android:textColor="?text_color"
-							android:text="@string/init_autoload" />
-				</LinearLayout>
-				<LinearLayout
-						android:layout_width="fill_parent"
-						android:layout_height="wrap_content"
-						android:orientation="horizontal" >
 					<CheckBox android:id="@+id/livelist"
 							android:layout_width="wrap_content"
 							android:layout_height="wrap_content"
@@ -476,20 +382,6 @@
 				<TextView style="@style/separator_horizontal_headline"
 						android:text="@string/init_mapsources" />
 			</RelativeLayout>
-			<TextView
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:layout_marginLeft="10dip"
-					android:layout_marginRight="10dip"
-					android:layout_marginBottom="5dip"
-					android:layout_alignParentLeft="true"
-					android:layout_gravity="left"
-					android:padding="3dip"
-					android:textSize="14dip"
-					android:textColor="?text_color"
-					android:textColorLink="?text_color_link"
-					android:linksClickable="true"
-					android:text="@string/init_mapsources_description" />
 			<Spinner  android:id="@+id/mapsource"
 					android:layout_width="fill_parent"
 					android:layout_height="wrap_content"

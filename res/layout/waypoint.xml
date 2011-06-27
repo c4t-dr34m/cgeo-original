@@ -13,12 +13,6 @@
 		 		android:id="@+id/compass"
 				android:src="@drawable/actionbar_compass"
 				android:onClick="goCompass" />
-		<View style="@style/action_bar_separator"
-		 		android:id="@+id/separator"
-		 />
-		<ImageView style="@style/action_bar_action"
-				android:src="@drawable/actionbar_manual"
-				android:onClick="goManual" />
 	</LinearLayout>
 	<ScrollView
 			android:layout_width="fill_parent"
