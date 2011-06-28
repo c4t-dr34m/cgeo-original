@@ -5,6 +5,7 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 /**
  * Defines the common functions of the provider-specific
@@ -29,5 +30,7 @@ public interface ActivityImpl {
 	boolean superOnPrepareOptionsMenu(Menu menu);
 
 	boolean superOnOptionsItemSelected(MenuItem item);
-
+	
+	void switchMyLoc(View view);
+	void goHome(View view);
 }

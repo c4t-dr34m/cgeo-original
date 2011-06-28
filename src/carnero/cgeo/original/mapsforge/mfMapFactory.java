@@ -25,7 +25,7 @@ public class mfMapFactory implements MapFactory{
 
 	@Override
 	public int getMapLayoutId() {
-		return R.layout.mfmap;
+		return R.layout.map_mapsforge;
 	}
 
 	@Override

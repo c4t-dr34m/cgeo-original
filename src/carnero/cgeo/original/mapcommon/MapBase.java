@@ -6,6 +6,7 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 /**
  * Base class for the map activity. Delegates base class calls to the
@@ -61,4 +62,11 @@ public class MapBase {
 		return mapActivity.superOnOptionsItemSelected(item);
 	}
 	
+	public void switchMyLoc(View view) {
+		mapActivity.switchMyLoc(view);
+	}
+	
+	public void goHome(View view) {
+		mapActivity.goHome(view);
+	}
 }

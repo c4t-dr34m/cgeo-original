@@ -388,6 +388,7 @@
 					android:prompt="@string/init_mapsource_select" />
 			<EditText style="@style/edittext"
 					android:id="@+id/mapfile"
+					android:visibility="gone"
 					android:singleLine="true"
 					android:lines="1"
 					android:scrollHorizontally="true" />

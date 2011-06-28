@@ -11,6 +11,10 @@
 		<TextView style="@style/action_bar_title" />
 		<ProgressBar style="@style/action_bar_progress"
 				android:visibility="gone" />
+		<ImageView style="@style/action_bar_action"
+				android:id="@+id/myloc"
+				android:src="@drawable/actionbar_myloc_off"
+				android:onClick="switchMyLoc" />
 	</LinearLayout>
 	<RelativeLayout
 			android:layout_width="fill_parent"
@@ -36,13 +40,5 @@
 				android:keepScreenOn="true"
 				android:enabled="true"
 				android:clickable="true" />
-		<ImageView android:id="@+id/my_position"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:layout_alignParentBottom="true"
-				android:layout_alignParentRight="true"
-				android:layout_margin="5dip"
-				android:padding="5dip"
-				android:src="@drawable/my_location_off" />
 	</RelativeLayout>
 </LinearLayout>

@@ -105,7 +105,7 @@ public class init extends Activity {
 	@Override
 	public void onResume() {
 		super.onResume();
-		
+
 		settings.load();
 	}
 
@@ -164,7 +164,7 @@ public class init extends Activity {
 	}
 
 	public void init() {
-		
+
 		// geocaching.com settings
 		String usernameNow = prefs.getString("username", null);
 		if (usernameNow != null) {
@@ -174,7 +174,7 @@ public class init extends Activity {
 		if (usernameNow != null) {
 			((EditText) findViewById(R.id.password)).setText(passwordNow);
 		}
-		
+
 		Button logMeIn = (Button) findViewById(R.id.log_me_in);
 		logMeIn.setOnClickListener(new logIn());
 
@@ -202,6 +202,7 @@ public class init extends Activity {
 		}
 		Button sigBtn = (Button) findViewById(R.id.signature_help);
 		sigBtn.setOnClickListener(new View.OnClickListener() {
+
 			public void onClick(View v) {
 				warning.helpDialog(res.getString(R.string.init_signature_help_title), res.getString(R.string.init_signature_help_text));
 			}
@@ -295,26 +296,27 @@ public class init extends Activity {
 			browserButton.setChecked(true);
 		}
 		browserButton.setOnClickListener(new cgeoChangeBrowser());
-		
+
 		// Altitude settings
 		EditText altitudeEdit = (EditText) findViewById(R.id.altitude);
 		altitudeEdit.setText("" + prefs.getInt("altcorrection", 0));
-		
+
 		// Map source settings
 		Spinner mapSourceSelector = (Spinner) findViewById(R.id.mapsource);
-	    ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
-	            this, R.array.map_sources, android.R.layout.simple_spinner_item);
-	    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-	    mapSourceSelector.setAdapter(adapter);		
+		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.map_sources, android.R.layout.simple_spinner_item);
+		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		
 		int mapsource = prefs.getInt("mapsource", 0);
+		
+		mapSourceSelector.setAdapter(adapter);
 		mapSourceSelector.setSelection(mapsource);
 		mapSourceSelector.setOnItemSelectedListener(new cgeoChangeMapSource());
-		
+
 		EditText mfmapFileEdit = (EditText) findViewById(R.id.mapfile);
 		mfmapFileEdit.setText(prefs.getString("mfmapfile", ""));
-		
+
 		setMapFileEditState();
-		
+
 		// Cache db backup
 		TextView lastBackup = (TextView) findViewById(R.id.backup_last);
 		File lastBackupFile = app.isRestoreFile();
@@ -323,18 +325,18 @@ public class init extends Activity {
 		} else {
 			lastBackup.setText(res.getString(R.string.init_backup_last_no));
 		}
-		
+
 	}
-	
+
 	public void backup(View view) {
 		final String file = app.backupDatabase();
-		
+
 		if (file != null) {
 			warning.helpDialog(res.getString(R.string.init_backup_backup), res.getString(R.string.init_backup_success) + "\n" + file);
 		} else {
 			warning.helpDialog(res.getString(R.string.init_backup_backup), res.getString(R.string.init_backup_failed));
 		}
-		
+
 		TextView lastBackup = (TextView) findViewById(R.id.backup_last);
 		File lastBackupFile = app.isRestoreFile();
 		if (lastBackupFile != null) {
@@ -343,23 +345,23 @@ public class init extends Activity {
 			lastBackup.setText(res.getString(R.string.init_backup_last_no));
 		}
 	}
-	
+
 	public void restore(View view) {
 		final boolean status = app.restoreDatabase();
-		
+
 		if (status) {
 			warning.helpDialog(res.getString(R.string.init_backup_restore), res.getString(R.string.init_restore_success));
 		} else {
 			warning.helpDialog(res.getString(R.string.init_backup_restore), res.getString(R.string.init_restore_failed));
 		}
 	}
-	
+
 	private void setMapFileEditState() {
 		EditText mapFileEdit = (EditText) findViewById(R.id.mapfile);
 		if (settings.mapProvider == mapSourceEnum.mapsforgeOffline) {
 			mapFileEdit.setVisibility(View.VISIBLE);
 		} else {
-			mapFileEdit.setVisibility(View.INVISIBLE);
+			mapFileEdit.setVisibility(View.GONE);
 		}
 	}
 
@@ -379,14 +381,14 @@ public class init extends Activity {
 		if (signatureNew == null) {
 			signatureNew = "";
 		}
-		
+
 		int altitudeNewInt = 0;
 		if (altitudeNew == null) {
 			altitudeNewInt = 0;
 		} else {
 			altitudeNewInt = new Integer(altitudeNew);
 		}
-		
+
 		if (mfmapFileNew == null) {
 			mfmapFileNew = "";
 		}

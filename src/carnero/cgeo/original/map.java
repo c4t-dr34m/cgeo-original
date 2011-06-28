@@ -338,7 +338,9 @@ public class map extends MapBase {
 				centerMap(geocodeIntent, searchIdIntent, latitudeIntent, longitudeIntent);
 			}
 		}
-		setMyLoc(null);
+		
+		setMyLocButton();
+		
 		startTimer();
 	}
 
@@ -362,6 +364,8 @@ public class map extends MapBase {
 		if (dir != null) {
 			dirUpdate.updateDir(dir);
 		}
+		
+		setMyLocButton();
 
 		startTimer();
 	}
@@ -1595,54 +1599,31 @@ public class map extends MapBase {
 		}
 	}
 
-	// switch My Location button image
-	private void setMyLoc(Boolean status) {
-		if (myLocSwitch == null) {
-			myLocSwitch = (ImageView) activity.findViewById(R.id.my_position);
-		}
-
-		if (status == null) {
-			if (followMyLocation == true) {
-				myLocSwitch.setImageResource(R.drawable.my_location_on);
-			} else {
-				myLocSwitch.setImageResource(R.drawable.my_location_off);
-			}
-		} else {
-			if (status == true) {
-				myLocSwitch.setImageResource(R.drawable.my_location_on);
-			} else {
-				myLocSwitch.setImageResource(R.drawable.my_location_off);
-			}
-		}
-
-		myLocSwitch.setOnClickListener(new MyLocationListener());
-	}
-
-	// set my location listener
-	private class MyLocationListener implements View.OnClickListener {
-
-		public void onClick(View view) {
-			if (myLocSwitch == null) {
-				myLocSwitch = (ImageView) activity.findViewById(R.id.my_position);
-			}
-
-			if (followMyLocation == true) {
-				followMyLocation = false;
-
-				myLocSwitch.setImageResource(R.drawable.my_location_off);
-			} else {
-				followMyLocation = true;
-				myLocationInMiddle();
-
-				myLocSwitch.setImageResource(R.drawable.my_location_on);
-			}
-		}
-	}
-
 	private GeoPointImpl makeGeoPoint(Double latitude, Double longitude) {
 		return settings.getMapFactory().getGeoPointBase((int) (latitude * 1e6), (int) (longitude * 1e6));
 	}
-
+	
+	private void setMyLocButton() {
+		final ImageView button = (ImageView) activity.findViewById(R.id.myloc);
+		
+		if (followMyLocation) {
+			button.setImageResource(R.drawable.actionbar_myloc_on);
+		} else {
+			button.setImageResource(R.drawable.actionbar_myloc_off);
+		}
+	}
+	
+	public void switchMyLoc(View view) {
+		if (followMyLocation == true) {
+			followMyLocation = false;
+		} else {
+			followMyLocation = true;
+			myLocationInMiddle();
+		}
+		
+		setMyLocButton();
+	}
+	
 	public void goHome(View view) {
 		base.goHome(activity);
 	}

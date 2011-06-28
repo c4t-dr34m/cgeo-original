@@ -25,7 +25,7 @@ public class googleMapFactory implements MapFactory{
 
 	@Override
 	public int getMapLayoutId() {
-		return R.layout.googlemap;
+		return R.layout.map_google;
 	}
 
 	@Override
