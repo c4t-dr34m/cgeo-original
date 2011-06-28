@@ -61,7 +61,6 @@ public class CacheListAdapter extends ArrayAdapter<Cache> {
 	private HashMap<String, Drawable> gcIcons = new HashMap<String, Drawable>();
 	private ArrayList<CompassMini> compasses = new ArrayList<CompassMini>();
 	private ArrayList<DistanceView> distances = new ArrayList<DistanceView>();
-	private int[] ratingBcgs = new int[3];
 	private float pixelDensity = 1f;
 	private static final int SWIPE_MIN_DISTANCE = 60;
 	private static final int SWIPE_MAX_OFF_PATH = 100;
@@ -99,16 +98,6 @@ public class CacheListAdapter extends ArrayAdapter<Cache> {
 			gcIcons.put("wherigo", (Drawable) activity.getResources().getDrawable(R.drawable.type_wherigo));
 			gcIcons.put("mystery", (Drawable) activity.getResources().getDrawable(R.drawable.type_mystery));
 			gcIcons.put("gchq", (Drawable) activity.getResources().getDrawable(R.drawable.type_hq));
-		}
-
-		if (settings.skin == 0) {
-			ratingBcgs[0] = R.drawable.favourite_background_red_dark;
-			ratingBcgs[1] = R.drawable.favourite_background_orange_dark;
-			ratingBcgs[2] = R.drawable.favourite_background_green_dark;
-		} else {
-			ratingBcgs[0] = R.drawable.favourite_background_red_light;
-			ratingBcgs[1] = R.drawable.favourite_background_orange_light;
-			ratingBcgs[2] = R.drawable.favourite_background_green_light;
 		}
 	}
 

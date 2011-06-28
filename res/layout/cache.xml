@@ -130,7 +130,7 @@
 				android:layout_alignParentRight="true"
 				android:layout_marginTop="1dip"
 				android:layout_marginBottom="1dip"
-				android:layout_marginRight="2dip" >
+				android:background="?additional" >
 			<RelativeLayout android:id="@+id/inventory"
 					android:visibility="gone"
 					android:layout_width="28dip"
@@ -138,8 +138,7 @@
 					android:layout_marginTop="2dip"
 					android:layout_centerHorizontal="true"
 					android:layout_alignParentTop="true"
-					android:layout_gravity="center"
-					android:background="?inventory" >
+					android:layout_gravity="center" >
 			</RelativeLayout>
 			<TextView android:id="@+id/favourite"
 					android:layout_width="28dip"
@@ -158,7 +157,6 @@
 					android:ellipsize="marquee"
 					android:textSize="12dip"
 					android:textStyle="bold"
-					android:background="?favourite"
 					android:textColor="?text_color" />
 		</RelativeLayout>
 	</RelativeLayout>
