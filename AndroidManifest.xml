@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-		android:versionCode="20110627"
-		android:versionName="2011.06.27"
+		android:versionCode="20110628"
+		android:versionName="2011.06.28"
 		package="carnero.cgeo.original"
 		name="c:geo" >
 	<uses-sdk android:minSdkVersion="7" android:targetSdkVersion="9" />
@@ -18,16 +18,16 @@
 		android:smallScreens="true"
 		android:anyDensity="true" />
 	<application
-			android:name=".cgeoapplication"
+			android:name=".libs.App"
 			android:theme="@style/cgeo"
 			android:label="@string/app_name"
 			android:icon="@drawable/cgeo" >
 		<uses-library android:name="com.google.android.maps" />
 		<meta-data
 			android:name="android.app.default_searchable"
-			android:value=".cgeoadvsearch" />
+			android:value=".advsearch" />
 		<activity
-			android:name=".cgeo"
+			android:name=".main"
 			android:label="@string/app_name"
 			android:windowSoftInputMode="stateHidden"
 			android:theme="@android:style/Theme.Wallpaper.NoTitleBar"
@@ -38,7 +38,7 @@
 			</intent-filter>
 		</activity>
 		<activity
-			android:name=".cgeoadvsearch"
+			android:name=".search"
 			android:label="@string/app_name"
 			android:launchMode="singleTop"
 			android:windowSoftInputMode="stateHidden"
@@ -47,82 +47,82 @@
 				<action android:name="android.intent.action.SEARCH"/>
 			</intent-filter>
 			<intent-filter>
-				<action android:name="carnero.cgeo.original.CGEOADVSEARCH"/>
+				<action android:name="carnero.cgeo.original.SEARCH"/>
 			</intent-filter>
 			<meta-data
 				android:name="android.app.searchable"
 				android:resource="@xml/searchable" />
 		</activity>
 		<activity
-			android:name=".cgeopopup"
+			android:name=".mapPopup"
 			android:label="@string/app_name"
 			android:theme="@style/cgeo_transparent"
 			android:windowSoftInputMode="stateHidden"
 			android:configChanges="keyboardHidden|orientation" >
 			<intent-filter>
-				<action android:name="carnero.cgeo.original.CGEOPOPUP"/>
+				<action android:name="carnero.cgeo.original.MAPPOPUP"/>
 			</intent-filter>
 		</activity>
 		<activity
-			android:name=".cgeoabout"
+			android:name=".about"
 			android:label="@string/app_name"
 			android:windowSoftInputMode="stateHidden"
 			android:configChanges="keyboardHidden|orientation" >
 			<intent-filter>
-				<action android:name="carnero.cgeo.original.CGEOABOUT"/>
+				<action android:name="carnero.cgeo.original.ABOUT"/>
 			</intent-filter>
 		</activity>
 		<activity
-			android:name=".cgeowaypointadd"
+			android:name=".waypointNew"
 			android:label="@string/app_name"
 			android:windowSoftInputMode="stateHidden"
 			android:configChanges="keyboardHidden|orientation" >
 			<intent-filter>
-				<action android:name="carnero.cgeo.original.CGEOWAYPOINTADD"/>
+				<action android:name="carnero.cgeo.original.WAYPOINTNEW"/>
 			</intent-filter>
 		</activity>
 		<activity
-			android:name=".cgeowaypoint"
+			android:name=".waypointDetail"
 			android:label="@string/app_name"
 			android:windowSoftInputMode="stateHidden"
 			android:configChanges="keyboardHidden|orientation" >
 			<intent-filter>
-				<action android:name="carnero.cgeo.original.CGEOWAYPOINT"/>
+				<action android:name="carnero.cgeo.original.WAYPOINTDETAIL"/>
 			</intent-filter>
 		</activity>
 		<activity
-			android:name=".cgeopoint"
+			android:name=".point"
 			android:label="@string/app_name"
 			android:windowSoftInputMode="stateHidden"
 			android:configChanges="keyboardHidden|orientation" >
 			<intent-filter>
-				<action android:name="carnero.cgeo.original.CGEOPOINT"/>
+				<action android:name="carnero.cgeo.original.POINT"/>
 			</intent-filter>
 		</activity>
 		<activity
-			android:name=".cgeoaddresses"
+			android:name=".addresses"
 			android:label="@string/app_name"
 			android:windowSoftInputMode="stateHidden"
 			android:configChanges="keyboardHidden|orientation" >
 			<intent-filter>
-				<action android:name="carnero.cgeo.original.CGEOADDRESSES"/>
+				<action android:name="carnero.cgeo.original.ADDRESSES"/>
 			</intent-filter>
 		</activity>
 		<activity
-			android:name=".cgeoinit"
+			android:name=".init"
 			android:label="@string/app_name"
 			android:windowSoftInputMode="stateHidden"
 			android:configChanges="keyboardHidden|orientation" >
 			<intent-filter>
-				<action android:name="carnero.cgeo.original.CGEOINIT"/>
+				<action android:name="carnero.cgeo.original.INIT"/>
 			</intent-filter>
 		</activity>
 		<activity
-			android:name=".cgeocaches"
+			android:name=".cacheList"
 			android:label="@string/app_name"
 			android:configChanges="keyboardHidden|orientation" >
 			<intent-filter>
-				<action android:name="carnero.cgeo.original.CGEOCACHES"/>
+				<action android:name="carnero.cgeo.original.CACHELIST"/>
 			</intent-filter>
 		</activity>
 		<activity
@@ -130,7 +130,7 @@
 			android:label="@string/app_name"
 			android:configChanges="keyboardHidden|orientation" >
 			<intent-filter>
-				<action android:name="carnero.cgeo.original.CGEOMAP"/>
+				<action android:name="carnero.cgeo.original.MAP"/>
 			</intent-filter>
 		</activity>
 		<activity
@@ -138,63 +138,63 @@
 			android:label="@string/app_name"
 			android:configChanges="keyboardHidden|orientation" >
 			<intent-filter>
-				<action android:name="carnero.cgeo.original.CGEOMAP"/>
+				<action android:name="carnero.cgeo.original.MAP"/>
 			</intent-filter>
 		</activity>
 		<activity
-			android:name=".cgeosmaps"
+			android:name=".mapStatic"
 			android:label="@string/app_name"
 			android:configChanges="keyboardHidden|orientation" >
 			<intent-filter>
-				<action android:name="carnero.cgeo.original.CGEOSMAPS"/>
+				<action android:name="carnero.cgeo.original.MAPSTATIC"/>
 			</intent-filter>
 		</activity>
 		<activity
-			android:name=".cgeologs"
+			android:name=".logs"
 			android:label="@string/app_name"
 			android:configChanges="keyboardHidden|orientation" >
 			<intent-filter>
-				<action android:name="carnero.cgeo.original.CGEOLOGS"/>
+				<action android:name="carnero.cgeo.original.LOGS"/>
 			</intent-filter>
 		</activity>
 		<activity
-			android:name=".cgeovisit"
+			android:name=".cacheLog"
 			android:label="@string/app_name"
 			android:configChanges="keyboardHidden|orientation" >
 			<intent-filter>
-				<action android:name="carnero.cgeo.original.CGEOVISIT"/>
+				<action android:name="carnero.cgeo.original.CACHELOG"/>
 			</intent-filter>
 		</activity>
 		<activity
-			android:name=".cgeotouch"
+			android:name=".trackableLog"
 			android:label="@string/app_name"
 			android:configChanges="keyboardHidden|orientation" >
 			<intent-filter>
-				<action android:name="carnero.cgeo.original.CGEOTOUCH"/>
+				<action android:name="carnero.cgeo.original.TRACKABLELOG"/>
 			</intent-filter>
 		</activity>
 		<activity
-			android:name=".cgeospoilers"
+			android:name=".spoilers"
 			android:label="@string/app_name"
 			android:configChanges="keyboardHidden|orientation" >
 			<intent-filter>
-				<action android:name="carnero.cgeo.original.CGEOSPOILERS"/>
+				<action android:name="carnero.cgeo.original.SPOILERS"/>
 			</intent-filter>
 		</activity>
 		<activity
-			android:name=".cgeotrackables"
+			android:name=".trackableList"
 			android:label="@string/app_name"
 			android:configChanges="keyboardHidden|orientation" >
 			<intent-filter>
-				<action android:name="carnero.cgeo.original.CGEOTRACKABLES"/>
+				<action android:name="carnero.cgeo.original.TRACKABLELIST"/>
 			</intent-filter>
 		</activity>
 		<activity
-				android:name=".cgeodetail"
+				android:name=".cacheDetail"
 				android:label="@string/app_name"
 				android:configChanges="keyboardHidden|orientation" >
 			<intent-filter>
-				<action android:name="carnero.cgeo.original.CGEODETAIL"/>
+				<action android:name="carnero.cgeo.original.CACHEDETAIL"/>
 			</intent-filter>
 			<intent-filter>
 				<action android:name="wikitudeapi.arcallback" />
@@ -220,11 +220,11 @@
 			</intent-filter>
 		</activity>
 		<activity
-				android:name=".cgeotrackable"
+				android:name=".trackableDetail"
 				android:label="@string/app_name"
 				android:configChanges="keyboardHidden|orientation" >
 			<intent-filter>
-				<action android:name="carnero.cgeo.original.CGEOTRACKABLE"/>
+				<action android:name="carnero.cgeo.original.TRACKABLEDETAIL"/>
 			</intent-filter>
 			<intent-filter>
 				<action android:name="android.intent.action.VIEW" />
@@ -246,19 +246,19 @@
 			</intent-filter>
 		</activity>
 		<activity
-				android:name=".cgeonavigate"
+				android:name=".navigate"
 				android:label="@string/app_name_compass"
 				android:screenOrientation="nosensor" >
 			<intent-filter>
-				<action android:name="carnero.cgeo.original.CGEONAVIGATE" />
+				<action android:name="carnero.cgeo.original.NAVIGATE" />
 			</intent-filter>
 		</activity>
 		<activity
-			android:name=".cgeogpxes"
+			android:name=".gpxes"
 			android:label="@string/app_name"
 			android:configChanges="keyboardHidden|orientation" >
 			<intent-filter>
-				<action android:name="carnero.cgeo.original.CGEOGPXES"/>
+				<action android:name="carnero.cgeo.original.GPXES"/>
 			</intent-filter>
 		</activity>
 	</application>

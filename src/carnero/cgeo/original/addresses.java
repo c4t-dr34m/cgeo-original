@@ -1,5 +1,6 @@
 package carnero.cgeo.original;
 
+import carnero.cgeo.original.libs.App;
 import carnero.cgeo.original.libs.Settings;
 import carnero.cgeo.original.libs.Base;
 import carnero.cgeo.original.libs.Warning;
@@ -21,11 +22,11 @@ import android.util.Log;
 import java.util.List;
 import java.util.Locale;
 
-public class cgeoaddresses extends Activity {
+public class addresses extends Activity {
 	private final ArrayList<Address> addresses = new ArrayList<Address>();
 	private String keyword = null;
 	private Activity activity = null;
-	private cgeoapplication app = null;
+	private App app = null;
 	private Settings settings = null;
 	private Base base = null;
 	private Resources res = null;
@@ -102,7 +103,7 @@ public class cgeoaddresses extends Activity {
 		// init
 		activity = this;
 		res = this.getResources();
-		app = (cgeoapplication) this.getApplication();
+		app = (App) this.getApplication();
 		settings = new Settings(this, getSharedPreferences(Settings.preferences, 0));
 		base = new Base(app, settings, getSharedPreferences(Settings.preferences, 0));
 		warning = new Warning(this);
@@ -185,7 +186,7 @@ public class cgeoaddresses extends Activity {
 		}
 
 		public void onClick(View arg0) {
-			Intent addressIntent = new Intent(activity, cgeocaches.class);
+			Intent addressIntent = new Intent(activity, cacheList.class);
 			addressIntent.putExtra("type", "address");
 			addressIntent.putExtra("latitude", (Double) latitude);
 			addressIntent.putExtra("longitude", (Double) longitude);

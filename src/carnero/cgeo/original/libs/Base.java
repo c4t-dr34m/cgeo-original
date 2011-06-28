@@ -7,8 +7,7 @@ import carnero.cgeo.original.models.Trackable;
 import carnero.cgeo.original.models.Response;
 import carnero.cgeo.original.models.Search;
 import carnero.cgeo.original.R;
-import carnero.cgeo.original.cgeo;
-import carnero.cgeo.original.cgeoapplication;
+import carnero.cgeo.original.main;
 import carnero.cgeo.original.models.Waypoint;
 import carnero.cgeo.original.models.Cache;
 import carnero.cgeo.original.models.CacheLog;
@@ -88,7 +87,7 @@ import org.json.JSONObject;
 public class Base {
 
 	public Context context = null;
-	private cgeoapplication app = null;
+	private App app = null;
 	private Settings settings = null;
 	private SharedPreferences prefs = null;
 	private Resources res = null;
@@ -154,7 +153,7 @@ public class Base {
 	public static final int LOG_WEBCAM_PHOTO_TAKEN = 11;
 	public static final int LOG_ANNOUNCEMENT = 74;
 
-	public Base(cgeoapplication appIn, Settings settingsIn, SharedPreferences prefsIn) {
+	public Base(App appIn, Settings settingsIn, SharedPreferences prefsIn) {
 		context = appIn.getBaseContext();
 		res = appIn.getBaseContext().getResources();
 
@@ -1827,7 +1826,7 @@ public class Base {
 		return caches;
 	}
 
-	public Long parseGPX(cgeoapplication app, File file, int listId, Handler handler) {
+	public Long parseGPX(App app, File file, int listId, Handler handler) {
 		Search search = new Search();
 		long searchId = 0l;
 
@@ -2783,7 +2782,7 @@ public class Base {
 			return searchId;
 		}
 
-		// save to application
+		// save to Application
 		app.setError(searchId, caches.error);
 		app.setViewstate(searchId, caches.viewstate);
 		app.setViewstate1(searchId, caches.viewstate1);
@@ -3451,7 +3450,7 @@ public class Base {
 		return trackable;
 	}
 
-	public int postLog(cgeoapplication app, String geocode, String cacheid, String viewstate, String viewstate1, int logType, int year, int month, int day, String log, ArrayList<TrackableLog> trackables) {
+	public int postLog(App app, String geocode, String cacheid, String viewstate, String viewstate1, int logType, int year, int month, int day, String log, ArrayList<TrackableLog> trackables) {
 		if (viewstate == null || viewstate.length() == 0) {
 			Log.e(Settings.tag, "cgeoBase.postLog: No viewstate given");
 			return 1000;
@@ -4667,7 +4666,7 @@ public class Base {
 		return (list.size() > 0);
 	}
 
-	public void storeCache(cgeoapplication app, Activity activity, Cache cache, String geocode, int listId, Handler handler) {
+	public void storeCache(App app, Activity activity, Cache cache, String geocode, int listId, Handler handler) {
 		try {
 			// cache details
 			if (cache != null) {
@@ -4771,7 +4770,7 @@ public class Base {
 		}
 	}
 
-	public void dropCache(cgeoapplication app, Activity activity, Cache cache, Handler handler) {
+	public void dropCache(App app, Activity activity, Cache cache, Handler handler) {
 		try {
 			app.markDropped(cache.geocode);
 			app.removeCacheFromCache(cache.geocode);
@@ -5486,7 +5485,7 @@ public class Base {
 	}
 
 	public void goHome(Activity activity) {
-		final Intent intent = new Intent(activity, cgeo.class);
+		final Intent intent = new Intent(activity, main.class);
 		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
 		activity.startActivity(intent);

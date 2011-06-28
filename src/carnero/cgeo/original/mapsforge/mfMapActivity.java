@@ -7,7 +7,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import carnero.cgeo.original.mapcommon.MapBase;
-import carnero.cgeo.original.mapcommon.cgeomap;
+import carnero.cgeo.original.map;
 import carnero.cgeo.original.mapinterfaces.ActivityImpl;
 
 
@@ -16,7 +16,7 @@ public class mfMapActivity extends MapActivity implements ActivityImpl {
 	private MapBase mapBase;
 	
 	public mfMapActivity() {
-		mapBase = new cgeomap(this);
+		mapBase = new map(this);
 	}
 	
 	@Override

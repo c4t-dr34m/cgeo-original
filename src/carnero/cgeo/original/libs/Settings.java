@@ -14,7 +14,7 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.util.Log;
 import carnero.cgeo.original.R;
-import carnero.cgeo.original.cgeoinit;
+import carnero.cgeo.original.init;
 
 public class Settings {
 	
@@ -227,7 +227,7 @@ public class Settings {
 			final String prePassword = prefs.getString("password", null);
 
 			if (initialized == 0 && (preUsername == null || prePassword == null)) {
-				Intent initIntent = new Intent(context, cgeoinit.class);
+				Intent initIntent = new Intent(context, init.class);
 				context.startActivity(initIntent);
 
 				final SharedPreferences.Editor prefsEdit = prefs.edit();

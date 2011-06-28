@@ -1,10 +1,12 @@
 package carnero.cgeo.original;
 
+import carnero.cgeo.original.libs.App;
 import carnero.cgeo.original.libs.Settings;
 import carnero.cgeo.original.libs.Base;
 import carnero.cgeo.original.libs.UpdateLoc;
 import carnero.cgeo.original.libs.Geo;
 import carnero.cgeo.original.libs.Warning;
+
 import android.os.Bundle;
 import android.os.Handler;
 import android.app.Activity;
@@ -35,10 +37,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map.Entry;
 
-public class cgeo extends Activity {
+public class main extends Activity {
 
 	private Resources res = null;
-	private cgeoapplication app = null;
+	private App app = null;
 	private Context context = null;
 	private Settings settings = null;
 	private SharedPreferences prefs = null;
@@ -128,7 +130,7 @@ public class cgeo extends Activity {
 
 		context = this;
 		res = this.getResources();
-		app = (cgeoapplication) this.getApplication();
+		app = (App) this.getApplication();
 		app.setAction(null);
 		settings = new Settings(this, getSharedPreferences(Settings.preferences, 0));
 		prefs = getSharedPreferences(Settings.preferences, 0);
@@ -225,11 +227,11 @@ public class cgeo extends Activity {
 
 			return true;
 		} else if (id == 1) {
-			context.startActivity(new Intent(context, cgeoinit.class));
+			context.startActivity(new Intent(context, init.class));
 
 			return true;
 		} else if (id == 2) {
-			final Intent cachesIntent = new Intent(context, cgeocaches.class);
+			final Intent cachesIntent = new Intent(context, cacheList.class);
 			cachesIntent.putExtra("type", "history");
 			context.startActivity(cachesIntent);
 
@@ -487,7 +489,7 @@ public class cgeo extends Activity {
 				return;
 			}
 
-			final Intent cachesIntent = new Intent(context, cgeocaches.class);
+			final Intent cachesIntent = new Intent(context, cacheList.class);
 			cachesIntent.putExtra("type", "nearest");
 			cachesIntent.putExtra("latitude", geo.latitudeNow);
 			cachesIntent.putExtra("longitude", geo.longitudeNow);
@@ -506,7 +508,7 @@ public class cgeo extends Activity {
 	private class cgeoFindByOfflineListener implements View.OnClickListener {
 
 		public void onClick(View arg0) {
-			final Intent cachesIntent = new Intent(context, cgeocaches.class);
+			final Intent cachesIntent = new Intent(context, cacheList.class);
 			cachesIntent.putExtra("type", "offline");
 			context.startActivity(cachesIntent);
 		}
@@ -515,14 +517,14 @@ public class cgeo extends Activity {
 	private class cgeoSearchListener implements View.OnClickListener {
 
 		public void onClick(View arg0) {
-			context.startActivity(new Intent(context, cgeoadvsearch.class));
+			context.startActivity(new Intent(context, search.class));
 		}
 	}
 
 	private class cgeoPointListener implements View.OnClickListener {
 
 		public void onClick(View arg0) {
-			context.startActivity(new Intent(context, cgeopoint.class));
+			context.startActivity(new Intent(context, point.class));
 		}
 	}
 
@@ -616,7 +618,7 @@ public class cgeo extends Activity {
 	}
 
 	public void showAbout(View view) {
-		context.startActivity(new Intent(context, cgeoabout.class));
+		context.startActivity(new Intent(context, about.class));
 	}
 
 	public void goSearch(View view) {

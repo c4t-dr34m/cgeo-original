@@ -1,5 +1,6 @@
 package carnero.cgeo.original;
 
+import carnero.cgeo.original.libs.App;
 import carnero.cgeo.original.libs.Base;
 import carnero.cgeo.original.libs.Warning;
 import carnero.cgeo.original.libs.Settings;
@@ -30,9 +31,9 @@ import java.io.File;
 
 import carnero.cgeo.original.libs.Settings.mapSourceEnum;
 
-public class cgeoinit extends Activity {
+public class init extends Activity {
 
-	private cgeoapplication app = null;
+	private App app = null;
 	private Resources res = null;
 	private Activity activity = null;
 	private Settings settings = null;
@@ -80,7 +81,7 @@ public class cgeoinit extends Activity {
 		// init
 		activity = this;
 		res = this.getResources();
-		app = (cgeoapplication) this.getApplication();
+		app = (App) this.getApplication();
 		prefs = getSharedPreferences(Settings.preferences, 0);
 		settings = new Settings(this, prefs);
 		base = new Base(app, settings, prefs);

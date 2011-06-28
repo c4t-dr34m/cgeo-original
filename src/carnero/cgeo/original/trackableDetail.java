@@ -1,5 +1,6 @@
 package carnero.cgeo.original;
 
+import carnero.cgeo.original.libs.App;
 import carnero.cgeo.original.models.Trackable;
 import carnero.cgeo.original.libs.Settings;
 import carnero.cgeo.original.libs.Base;
@@ -33,7 +34,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.widget.ImageView;
 
-public class cgeotrackable extends Activity {
+public class trackableDetail extends Activity {
 	public Trackable trackable = null;
 	public String geocode = null;
 	public String name = null;
@@ -41,7 +42,7 @@ public class cgeotrackable extends Activity {
 	public String id = null;
 	private String contextMenuUser = null;
 	private Resources res = null;
-	private cgeoapplication app = null;
+	private App app = null;
 	private Activity activity = null;
 	private LayoutInflater inflater = null;
 	private Settings settings = null;
@@ -105,7 +106,7 @@ public class cgeotrackable extends Activity {
 					iconThread.start();
 				}
 
-				// trackable name
+				// trackableDetail name
 				itemLayout = (RelativeLayout)inflater.inflate(R.layout.cache_item, null);
 				itemName = (TextView) itemLayout.findViewById(R.id.name);
 				itemValue = (TextView) itemLayout.findViewById(R.id.value);
@@ -118,7 +119,7 @@ public class cgeotrackable extends Activity {
 				}
 				detailsList.addView(itemLayout);
 
-				// trackable type
+				// trackableDetail type
 				itemLayout = (RelativeLayout)inflater.inflate(R.layout.cache_item, null);
 				itemName = (TextView) itemLayout.findViewById(R.id.name);
 				itemValue = (TextView) itemLayout.findViewById(R.id.value);
@@ -133,7 +134,7 @@ public class cgeotrackable extends Activity {
 				itemValue.setText(tbType);
 				detailsList.addView(itemLayout);
 
-				// trackable geocode
+				// trackableDetail geocode
 				itemLayout = (RelativeLayout)inflater.inflate(R.layout.cache_item, null);
 				itemName = (TextView) itemLayout.findViewById(R.id.name);
 				itemValue = (TextView) itemLayout.findViewById(R.id.value);
@@ -142,7 +143,7 @@ public class cgeotrackable extends Activity {
 				itemValue.setText(trackable.geocode.toUpperCase());
 				detailsList.addView(itemLayout);
 
-				// trackable owner
+				// trackableDetail owner
 				itemLayout = (RelativeLayout)inflater.inflate(R.layout.cache_item, null);
 				itemName = (TextView) itemLayout.findViewById(R.id.name);
 				itemValue = (TextView) itemLayout.findViewById(R.id.value);
@@ -156,7 +157,7 @@ public class cgeotrackable extends Activity {
 				}
 				detailsList.addView(itemLayout);
 
-				// trackable spotted
+				// trackableDetail spotted
 				if (
 						(trackable.spottedName != null && trackable.spottedName.length() > 0) ||
 						trackable.spottedType == Trackable.SPOTTED_UNKNOWN ||
@@ -186,7 +187,7 @@ public class cgeotrackable extends Activity {
 					if (Trackable.SPOTTED_CACHE == trackable.spottedType) {
 						itemLayout.setOnClickListener(new View.OnClickListener() {
 							public void onClick(View arg0) {
-								Intent cacheIntent = new Intent(activity, cgeodetail.class);
+								Intent cacheIntent = new Intent(activity, cacheDetail.class);
 								cacheIntent.putExtra("guid", (String) trackable.spottedGuid);
 								cacheIntent.putExtra("name", (String) trackable.spottedName);
 								activity.startActivity(cacheIntent);
@@ -194,13 +195,13 @@ public class cgeotrackable extends Activity {
 						});
 					} else if (Trackable.SPOTTED_USER == trackable.spottedType) {
 						itemLayout.setOnClickListener(new userActions());
-						//activity.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.geocaching.com/profile/?guid=" + trackable.spottedGuid)));
+						//activity.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.geocaching.com/profile/?guid=" + trackableDetail.spottedGuid)));
 					}
 					
 					detailsList.addView(itemLayout);
 				}
 
-				// trackable origin
+				// trackableDetail origin
 				if (trackable.origin != null && trackable.origin.length() > 0) {
 					itemLayout = (RelativeLayout)inflater.inflate(R.layout.cache_item, null);
 					itemName = (TextView) itemLayout.findViewById(R.id.name);
@@ -211,7 +212,7 @@ public class cgeotrackable extends Activity {
 					detailsList.addView(itemLayout);
 				}
 
-				// trackable released
+				// trackableDetail released
 				if (trackable.released != null) {
 					itemLayout = (RelativeLayout)inflater.inflate(R.layout.cache_item, null);
 					itemName = (TextView) itemLayout.findViewById(R.id.name);
@@ -222,7 +223,7 @@ public class cgeotrackable extends Activity {
 					detailsList.addView(itemLayout);
 				}
 				
-				// trackable distance
+				// trackableDetail distance
 				if (trackable.distance != null) {
 					itemLayout = (RelativeLayout)inflater.inflate(R.layout.cache_item, null);
 					itemName = (TextView) itemLayout.findViewById(R.id.name);
@@ -234,7 +235,7 @@ public class cgeotrackable extends Activity {
 				}
 
 				
-				// trackable goal
+				// trackableDetail goal
 				if (trackable.goal != null && trackable.goal.length() > 0) {
 					((LinearLayout) findViewById(R.id.goal_box)).setVisibility(View.VISIBLE);
 					TextView descView = (TextView) findViewById(R.id.goal);
@@ -243,7 +244,7 @@ public class cgeotrackable extends Activity {
 					descView.setMovementMethod(LinkMovementMethod.getInstance());
 				}
 
-				// trackable details
+				// trackableDetail details
 				if (trackable.details != null && trackable.details.length() > 0) {
 					((LinearLayout) findViewById(R.id.details_box)).setVisibility(View.VISIBLE);
 					TextView descView = (TextView) findViewById(R.id.details);
@@ -252,7 +253,7 @@ public class cgeotrackable extends Activity {
 					descView.setMovementMethod(LinkMovementMethod.getInstance());
 				}
 
-				// trackable image
+				// trackableDetail image
 				if (trackable.image != null && trackable.image.length() > 0) {
 					((LinearLayout) findViewById(R.id.image_box)).setVisibility(View.VISIBLE);
 					LinearLayout imgView = (LinearLayout) findViewById(R.id.image);
@@ -318,7 +319,7 @@ public class cgeotrackable extends Activity {
 		// init
 		activity = this;
 		res = this.getResources();
-		app = (cgeoapplication) this.getApplication();
+		app = (App) this.getApplication();
 		settings = new Settings(this, getSharedPreferences(Settings.preferences, 0));
 		base = new Base(app, settings, getSharedPreferences(Settings.preferences, 0));
 		warning = new Warning(this);
@@ -421,7 +422,7 @@ public class cgeotrackable extends Activity {
 
 		if (viewId == R.id.author) { // CacheLog item author
 			contextMenuUser = ((TextView)view).getText().toString();
-		} else { // Trackable owner, and user holding trackable now
+		} else { // Trackable owner, and user holding trackableDetail now
 			RelativeLayout itemLayout = (RelativeLayout)view;
 			TextView itemName = (TextView) itemLayout.findViewById(R.id.name);
 
@@ -444,7 +445,7 @@ public class cgeotrackable extends Activity {
 		final int id = item.getItemId();
 
 		if (id == 1) {
-			final Intent cachesIntent = new Intent(activity, cgeocaches.class);
+			final Intent cachesIntent = new Intent(activity, cacheList.class);
 
 			cachesIntent.putExtra("type", "owner");
 			cachesIntent.putExtra("username", contextMenuUser);
@@ -454,7 +455,7 @@ public class cgeotrackable extends Activity {
 
 			return true;
 		} else if (id == 2) {
-			final Intent cachesIntent = new Intent(activity, cgeocaches.class);
+			final Intent cachesIntent = new Intent(activity, cacheList.class);
 
 			cachesIntent.putExtra("type", "username");
 			cachesIntent.putExtra("username", contextMenuUser);
@@ -473,7 +474,7 @@ public class cgeotrackable extends Activity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		menu.add(0, 1, 0, res.getString(R.string.trackable_log_touch)).setIcon(android.R.drawable.ic_menu_agenda); // log touch
+		menu.add(0, 1, 0, res.getString(R.string.trackable_log_touch)).setIcon(android.R.drawable.ic_menu_agenda); // log trackableLog
 
 		menu.add(0, 2, 0, res.getString(R.string.trackable_browser_open)).setIcon(android.R.drawable.ic_menu_info_details); // browser
 		return true;
@@ -538,7 +539,7 @@ public class cgeotrackable extends Activity {
 	}
 	
 	private void displayLogs() {
-		// trackable logs
+		// trackableDetail logs
 		LinearLayout listView = (LinearLayout) findViewById(R.id.log_list);
 		listView.removeAllViews();
 
@@ -569,7 +570,7 @@ public class cgeotrackable extends Activity {
 					final String cacheName = log.cacheName;
 					((TextView) rowView.findViewById(R.id.location)).setOnClickListener(new View.OnClickListener() {
 						public void onClick(View arg0) {
-							Intent cacheIntent = new Intent(activity, cgeodetail.class);
+							Intent cacheIntent = new Intent(activity, cacheDetail.class);
 							cacheIntent.putExtra("guid", (String) cacheGuid);
 							cacheIntent.putExtra("name", (String) Html.fromHtml(cacheName).toString());
 							activity.startActivity(cacheIntent);
@@ -606,7 +607,7 @@ public class cgeotrackable extends Activity {
 	}
 
 	private void logTouch() {
-		Intent logTouchIntent = new Intent(activity, cgeotouch.class);
+		Intent logTouchIntent = new Intent(activity, trackableLog.class);
 		logTouchIntent.putExtra("geocode", trackable.geocode.toUpperCase());
 		logTouchIntent.putExtra("guid", trackable.guid);
 		activity.startActivity(logTouchIntent);

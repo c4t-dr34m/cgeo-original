@@ -31,7 +31,7 @@ import android.view.animation.TranslateAnimation;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import carnero.cgeo.original.R;
-import carnero.cgeo.original.cgeodetail;
+import carnero.cgeo.original.cacheDetail;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -674,7 +674,7 @@ public class CacheListAdapter extends ArrayAdapter<Cache> {
 			}
 
 			// load cache details
-			Intent cachesIntent = new Intent(getContext(), cgeodetail.class);
+			Intent cachesIntent = new Intent(getContext(), cacheDetail.class);
 			cachesIntent.putExtra("geocode", geocode);
 			cachesIntent.putExtra("name", name);
 			getContext().startActivity(cachesIntent);

@@ -14,7 +14,6 @@ import android.sax.StartElementListener;
 import android.text.Html;
 import android.util.Log;
 import android.util.Xml;
-import carnero.cgeo.original.cgeoapplication;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
@@ -25,7 +24,7 @@ import org.xml.sax.Attributes;
 
 public class GPXParser {
 
-	private cgeoapplication app = null;
+	private App app = null;
 	private Base base = null;
 	private int listId = 1;
 	private Search search = null;
@@ -44,7 +43,7 @@ public class GPXParser {
 	private String cmt = null;
 	private String desc = null;
 
-	public GPXParser(cgeoapplication appIn, Base baseIn, int listIdIn, Search searchIn) {
+	public GPXParser(App appIn, Base baseIn, int listIdIn, Search searchIn) {
 		app = appIn;
 		base = baseIn;
 		listId = listIdIn;

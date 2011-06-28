@@ -1,5 +1,6 @@
 package carnero.cgeo.original;
 
+import carnero.cgeo.original.libs.App;
 import carnero.cgeo.original.models.Trackable;
 import carnero.cgeo.original.libs.Settings;
 import carnero.cgeo.original.libs.Base;
@@ -18,10 +19,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
-public class cgeotrackables extends Activity {
+public class trackableList extends Activity {
 	private ArrayList<Trackable> trackables = new ArrayList<Trackable>();
 	private String geocode = null;
-	private cgeoapplication app = null;
+	private App app = null;
 	private Settings settings = null;
 	private Base base = null;
 	private Warning warning = null;
@@ -87,7 +88,7 @@ public class cgeotrackables extends Activity {
 
 		// init
 		activity = this;
-		app = (cgeoapplication) this.getApplication();
+		app = (App) this.getApplication();
 		settings = new Settings(this, getSharedPreferences(Settings.preferences, 0));
 		base = new Base(app, settings, getSharedPreferences(Settings.preferences, 0));
 		warning = new Warning(this);
@@ -158,7 +159,7 @@ public class cgeotrackables extends Activity {
 		}
 
 		public void onClick(View arg0) {
-			Intent trackableIntent = new Intent(activity, cgeotrackable.class);
+			Intent trackableIntent = new Intent(activity, trackableDetail.class);
 			trackableIntent.putExtra("guid", guid);
 			trackableIntent.putExtra("geocode", geocode);
 			trackableIntent.putExtra("name", name);

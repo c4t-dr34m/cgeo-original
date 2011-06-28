@@ -1,20 +1,12 @@
-package carnero.cgeo.original;
+package carnero.cgeo.original.libs;
 
 import carnero.cgeo.original.models.Waypoint;
 import carnero.cgeo.original.models.Search;
 import carnero.cgeo.original.models.Trackable;
 import carnero.cgeo.original.models.Spoiler;
-import carnero.cgeo.original.libs.Base;
-import carnero.cgeo.original.libs.Direction;
-import carnero.cgeo.original.libs.Geo;
-import carnero.cgeo.original.libs.UpdateDir;
-import carnero.cgeo.original.libs.Warning;
-import carnero.cgeo.original.libs.Data;
 import carnero.cgeo.original.models.Cache;
 import carnero.cgeo.original.models.CachesList;
-import carnero.cgeo.original.libs.Settings;
 import carnero.cgeo.original.models.CacheLog;
-import carnero.cgeo.original.libs.UpdateLoc;
 import android.app.Application;
 import android.content.Context;
 import android.util.Log;
@@ -24,7 +16,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-public class cgeoapplication extends Application {
+public class App extends Application {
 
 	private Data storage = null;
 	private String action = null;
@@ -40,7 +32,7 @@ public class cgeoapplication extends Application {
 	public boolean warnedLanguage = false; // user was warned about different language settings on geocaching.com
 	private boolean databaseCleaned = false; // database was cleaned
 
-	public cgeoapplication() {
+	public App() {
 		if (storage == null) {
 			storage = new Data(this);
 		}

@@ -1,5 +1,6 @@
 package carnero.cgeo.original;
 
+import carnero.cgeo.original.libs.App;
 import carnero.cgeo.original.models.Cache;
 import carnero.cgeo.original.libs.LogForm;
 import carnero.cgeo.original.libs.Settings;
@@ -33,8 +34,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 
-public class cgeovisit extends LogForm {
-	private cgeoapplication app = null;
+public class cacheLog extends LogForm {
+	private App app = null;
 	private Activity activity = null;
 	private Resources res = null;
 	private LayoutInflater inflater = null;
@@ -132,7 +133,7 @@ public class cgeovisit extends LogForm {
 					inventoryItem.findViewById(R.id.info).setOnClickListener(new View.OnClickListener() {
 
 						public void onClick(View view) {
-							final Intent trackablesIntent = new Intent(activity, cgeotrackable.class);
+							final Intent trackablesIntent = new Intent(activity, trackableDetail.class);
 							trackablesIntent.putExtra("geocode", tbCode);
 							activity.startActivity(trackablesIntent);
 						}
@@ -221,7 +222,7 @@ public class cgeovisit extends LogForm {
 		// init
 		activity = this;
 		res = this.getResources();
-		app = (cgeoapplication) this.getApplication();
+		app = (App) this.getApplication();
 		settings = new Settings(this, getSharedPreferences(Settings.preferences, 0));
 		base = new Base(app, settings, getSharedPreferences(Settings.preferences, 0));
 		warning = new Warning(this);
@@ -627,7 +628,7 @@ public class cgeovisit extends LogForm {
 	private class cgeovisitDateListener implements View.OnClickListener {
 
 		public void onClick(View arg0) {
-			Dialog dateDialog = new cgeodate(activity, (cgeovisit) activity, date);
+			Dialog dateDialog = new date(activity, (cacheLog) activity, date);
 			dateDialog.setCancelable(true);
 			dateDialog.show();
 		}

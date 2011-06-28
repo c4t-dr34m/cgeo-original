@@ -1,5 +1,6 @@
 package carnero.cgeo.original;
 
+import carnero.cgeo.original.libs.App;
 import carnero.cgeo.original.models.Spoiler;
 import carnero.cgeo.original.libs.Settings;
 import carnero.cgeo.original.libs.Base;
@@ -25,11 +26,11 @@ import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.view.ViewGroup.LayoutParams;
 
-public class cgeospoilers extends Activity {
+public class spoilers extends Activity {
 	private ArrayList<Spoiler> spoilers = new ArrayList<Spoiler>();
 	private Resources res = null;
 	private String geocode = null;
-	private cgeoapplication app = null;
+	private App app = null;
 	private Activity activity = null;
 	private Settings settings = null;
 	private Base base = null;
@@ -125,7 +126,7 @@ public class cgeospoilers extends Activity {
 		// init
 		activity = this;
 		res = this.getResources();
-		app = (cgeoapplication) this.getApplication();
+		app = (App) this.getApplication();
 		settings = new Settings(this, getSharedPreferences(Settings.preferences, 0));
 		base = new Base(app, settings, getSharedPreferences(Settings.preferences, 0));
 		warning = new Warning(this);

@@ -1,5 +1,6 @@
 package carnero.cgeo.original;
 
+import carnero.cgeo.original.libs.App;
 import carnero.cgeo.original.libs.Settings;
 import carnero.cgeo.original.libs.Base;
 import carnero.cgeo.original.libs.UpdateLoc;
@@ -29,10 +30,10 @@ import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class cgeopoint extends Activity {
+public class point extends Activity {
 
 	private Resources res = null;
-	private cgeoapplication app = null;
+	private App app = null;
 	private Settings settings = null;
 	private SharedPreferences prefs = null;
 	private Base base = null;
@@ -51,7 +52,7 @@ public class cgeopoint extends Activity {
 
 		// init
 		activity = this;
-		app = (cgeoapplication) this.getApplication();
+		app = (App) this.getApplication();
 		res = this.getResources();
 		settings = new Settings(activity, activity.getSharedPreferences(Settings.preferences, 0));
 		prefs = getSharedPreferences(Settings.preferences, 0);
@@ -171,7 +172,7 @@ public class cgeopoint extends Activity {
 		subMenu.add(0, 23, 0, res.getString(R.string.cache_menu_map_ext)); // ext.: other
 		subMenu.add(0, 4, 0, res.getString(R.string.cache_menu_tbt)); // turn-by-turn
 		
-		menu.add(0, 5, 0, res.getString(R.string.cache_menu_around)).setIcon(android.R.drawable.ic_menu_rotate); // caches around
+		menu.add(0, 5, 0, res.getString(R.string.cache_menu_around)).setIcon(android.R.drawable.ic_menu_rotate); // cacheList around
 
 		return true;
 	}
@@ -261,7 +262,7 @@ public class cgeopoint extends Activity {
 			warning.showToast(res.getString(R.string.err_location_unknown));
 		}
 
-		cgeonavigate navigateActivity = new cgeonavigate();
+		navigate navigateActivity = new navigate();
 
 		Intent navigateIntent = new Intent(activity, navigateActivity.getClass());
 		navigateIntent.putExtra("latitude", coords.get(0));
@@ -325,7 +326,7 @@ public class cgeopoint extends Activity {
 			warning.showToast(res.getString(R.string.err_location_unknown));
 		}
 		
-		cgeocaches cachesActivity = new cgeocaches();
+		cacheList cachesActivity = new cacheList();
 
 		Intent cachesIntent = new Intent(activity, cachesActivity.getClass());
 		

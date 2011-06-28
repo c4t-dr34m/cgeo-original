@@ -1,5 +1,6 @@
 package carnero.cgeo.original;
 
+import carnero.cgeo.original.libs.App;
 import carnero.cgeo.original.models.Cache;
 import carnero.cgeo.original.libs.Settings;
 import carnero.cgeo.original.libs.Base;
@@ -36,12 +37,12 @@ import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 import java.util.HashMap;
 import java.util.Locale;
 
-public class cgeopopup extends Activity {
+public class mapPopup extends Activity {
 
 	private GoogleAnalyticsTracker tracker = null;
 	private Activity activity = null;
 	private Resources res = null;
-	private cgeoapplication app = null;
+	private App app = null;
 	private Settings settings = null;
 	private Base base = null;
 	private Warning warning = null;
@@ -109,7 +110,7 @@ public class cgeopopup extends Activity {
 		// init
 		activity = this;
 		res = this.getResources();
-		app = (cgeoapplication) this.getApplication();
+		app = (App) this.getApplication();
 		settings = new Settings(this, getSharedPreferences(Settings.preferences, 0));
 		base = new Base(app, settings, getSharedPreferences(Settings.preferences, 0));
 		warning = new Warning(this);
@@ -156,8 +157,8 @@ public class cgeopopup extends Activity {
 		subMenu.add(0, 23, 0, res.getString(R.string.cache_menu_map_ext)); // ext.: other
 		subMenu.add(0, 4, 0, res.getString(R.string.cache_menu_tbt)); // turn-by-turn
 
-		menu.add(0, 6, 0, res.getString(R.string.cache_menu_visit)).setIcon(android.R.drawable.ic_menu_agenda); // log visit
-		menu.add(0, 5, 0, res.getString(R.string.cache_menu_around)).setIcon(android.R.drawable.ic_menu_rotate); // caches around
+		menu.add(0, 6, 0, res.getString(R.string.cache_menu_visit)).setIcon(android.R.drawable.ic_menu_agenda); // log cacheLog
+		menu.add(0, 5, 0, res.getString(R.string.cache_menu_around)).setIcon(android.R.drawable.ic_menu_rotate); // cacheList around
 		menu.add(0, 7, 0, res.getString(R.string.cache_menu_browser)).setIcon(android.R.drawable.ic_menu_info_details); // browser
 
 		return true;
@@ -220,7 +221,7 @@ public class cgeopopup extends Activity {
 				return false;
 			}
 
-			Intent logVisitIntent = new Intent(activity, cgeovisit.class);
+			Intent logVisitIntent = new Intent(activity, cacheLog.class);
 			logVisitIntent.putExtra("id", cache.cacheid);
 			logVisitIntent.putExtra("geocode", cache.geocode.toUpperCase());
 			logVisitIntent.putExtra("type", cache.type.toLowerCase());
@@ -439,7 +440,7 @@ public class cgeopopup extends Activity {
 				buttonMore.setOnClickListener(new OnClickListener() {
 
 					public void onClick(View arg0) {
-						Intent cachesIntent = new Intent(activity, cgeodetail.class);
+						Intent cachesIntent = new Intent(activity, cacheDetail.class);
 						cachesIntent.putExtra("geocode", geocode.toUpperCase());
 						activity.startActivity(cachesIntent);
 
@@ -590,7 +591,7 @@ public class cgeopopup extends Activity {
 			warning.showToast(res.getString(R.string.err_location_unknown));
 		}
 
-		cgeonavigate navigateActivity = new cgeonavigate();
+		navigate navigateActivity = new navigate();
 
 		Intent navigateIntent = new Intent(activity, navigateActivity.getClass());
 		navigateIntent.putExtra("latitude", cache.latitude);
@@ -650,7 +651,7 @@ public class cgeopopup extends Activity {
 			warning.showToast(res.getString(R.string.err_location_unknown));
 		}
 
-		cgeocaches cachesActivity = new cgeocaches();
+		cacheList cachesActivity = new cacheList();
 
 		Intent cachesIntent = new Intent(activity, cachesActivity.getClass());
 
@@ -733,7 +734,7 @@ public class cgeopopup extends Activity {
 			return;
 		}
 
-		cgeonavigate navigateActivity = new cgeonavigate();
+		navigate navigateActivity = new navigate();
 
 		Intent navigateIntent = new Intent(activity, navigateActivity.getClass());
 		navigateIntent.putExtra("latitude", cache.latitude);

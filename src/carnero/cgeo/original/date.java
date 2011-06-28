@@ -1,5 +1,6 @@
 package carnero.cgeo.original;
 
+import carnero.cgeo.original.libs.App;
 import carnero.cgeo.original.libs.LogForm;
 import carnero.cgeo.original.libs.Settings;
 import carnero.cgeo.original.libs.Base;
@@ -12,7 +13,7 @@ import android.view.Window;
 import android.widget.DatePicker;
 import java.util.Calendar;
 
-public class cgeodate extends Dialog {
+public class date extends Dialog {
 
 	private Settings settings = null;
 	private Base base = null;
@@ -20,12 +21,12 @@ public class cgeodate extends Dialog {
 	private LogForm parent = null;
 	private Calendar date = Calendar.getInstance();
 
-	public cgeodate(Activity contextIn, LogForm parentIn, Calendar dateIn) {
+	public date(Activity contextIn, LogForm parentIn, Calendar dateIn) {
 		super(contextIn);
 
 		// init
 		settings = new Settings(contextIn, contextIn.getSharedPreferences(Settings.preferences, 0));
-		base = new Base((cgeoapplication) contextIn.getApplication(), settings, contextIn.getSharedPreferences(Settings.preferences, 0));
+		base = new Base((App) contextIn.getApplication(), settings, contextIn.getSharedPreferences(Settings.preferences, 0));
 		warning = new Warning(contextIn);
 		date = dateIn;
 

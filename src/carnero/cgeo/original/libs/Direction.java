@@ -8,16 +8,13 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorManager;
 import android.hardware.SensorEventListener;
-import android.os.Build;
 import android.view.Display;
-import android.view.Surface;
-import carnero.cgeo.original.cgeoapplication;
 
 public class Direction {
 
 	private Resources res = null;
 	private Direction dir = null;
-	private cgeoapplication app = null;
+	private App app = null;
 	private Context context = null;
 	private Warning warning = null;
 	private SensorManager sensorManager = null;
@@ -25,7 +22,7 @@ public class Direction {
 	private UpdateDir dirUpdate = null;
 	public Double directionNow = null;
 
-	public Direction(cgeoapplication appIn, Context contextIn, UpdateDir dirUpdateIn, Warning warningIn) {
+	public Direction(App appIn, Context contextIn, UpdateDir dirUpdateIn, Warning warningIn) {
 		app = appIn;
 		context = contextIn;
 		dirUpdate = dirUpdateIn;

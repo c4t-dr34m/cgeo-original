@@ -1,5 +1,6 @@
 package carnero.cgeo.original;
 
+import carnero.cgeo.original.libs.App;
 import carnero.cgeo.original.models.Waypoint;
 import carnero.cgeo.original.models.Cache;
 import carnero.cgeo.original.models.Coord;
@@ -61,7 +62,7 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Map.Entry;
 
-public class cgeodetail extends Activity {
+public class cacheDetail extends Activity {
 	public Long searchId = null;
 	public Cache cache = null;
 	public String geocode = null;
@@ -71,7 +72,7 @@ public class cgeodetail extends Activity {
 	private Resources res = null;
 	private Activity activity = null;
 	private LayoutInflater inflater = null;
-	private cgeoapplication app = null;
+	private App app = null;
 	private Settings settings = null;
 	private Base base = null;
 	private Warning warning = null;
@@ -225,7 +226,7 @@ public class cgeodetail extends Activity {
 		// init
 		activity = this;
 		res = this.getResources();
-		app = (cgeoapplication) this.getApplication();
+		app = (App) this.getApplication();
 		settings = new Settings(this, getSharedPreferences(Settings.preferences, 0));
 		base = new Base(app, settings, getSharedPreferences(Settings.preferences, 0));
 		warning = new Warning(this);
@@ -402,7 +403,7 @@ public class cgeodetail extends Activity {
 			final int id = item.getItemId();
 
 			if (id == 1) {
-				final Intent cachesIntent = new Intent(activity, cgeocaches.class);
+				final Intent cachesIntent = new Intent(activity, cacheList.class);
 
 				cachesIntent.putExtra("type", "owner");
 				cachesIntent.putExtra("username", contextMenuUser);
@@ -412,7 +413,7 @@ public class cgeodetail extends Activity {
 
 				return true;
 			} else if (id == 2) {
-				final Intent cachesIntent = new Intent(activity, cgeocaches.class);
+				final Intent cachesIntent = new Intent(activity, cacheList.class);
 
 				cachesIntent.putExtra("type", "username");
 				cachesIntent.putExtra("username", contextMenuUser);
@@ -455,7 +456,7 @@ public class cgeodetail extends Activity {
 			menu.add(1, 11, 0, res.getString(R.string.cache_menu_event)).setIcon(android.R.drawable.ic_menu_agenda); // add event to calendar
 		}
 		if (settings.isLogin() == true) {
-			menu.add(1, 3, 0, res.getString(R.string.cache_menu_visit)).setIcon(android.R.drawable.ic_menu_agenda); // log visit
+			menu.add(1, 3, 0, res.getString(R.string.cache_menu_visit)).setIcon(android.R.drawable.ic_menu_agenda); // log cacheLog
 		}
 
 		if (cache != null && cache.spoilers != null && cache.spoilers.size() > 0) {
@@ -463,7 +464,7 @@ public class cgeodetail extends Activity {
 		}
 
 		if (cache != null && cache.latitude != null && cache.longitude != null) {
-			menu.add(0, 10, 0, res.getString(R.string.cache_menu_around)).setIcon(android.R.drawable.ic_menu_rotate); // caches around
+			menu.add(0, 10, 0, res.getString(R.string.cache_menu_around)).setIcon(android.R.drawable.ic_menu_rotate); // cacheList around
 		}
 
 		menu.add(1, 7, 0, res.getString(R.string.cache_menu_browser)).setIcon(android.R.drawable.ic_menu_info_details); // browser
@@ -1336,7 +1337,7 @@ public class cgeodetail extends Activity {
 	}
 
 	private void cachesAround() {
-		cgeocaches cachesActivity = new cgeocaches();
+		cacheList cachesActivity = new cacheList();
 
 		Intent cachesIntent = new Intent(activity, cachesActivity.getClass());
 		cachesIntent.putExtra("type", "coordinate");
@@ -1476,7 +1477,7 @@ public class cgeodetail extends Activity {
 			warning.showToast(res.getString(R.string.err_location_unknown));
 		}
 
-		cgeonavigate navigateActivity = new cgeonavigate();
+		navigate navigateActivity = new navigate();
 
 		Intent navigateIntent = new Intent(activity, navigateActivity.getClass());
 		navigateIntent.putExtra("latitude", cache.latitude);
@@ -1484,10 +1485,10 @@ public class cgeodetail extends Activity {
 		navigateIntent.putExtra("geocode", cache.geocode.toUpperCase());
 		navigateIntent.putExtra("name", cache.name);
 
-		if (cgeonavigate.coordinates != null) {
-			cgeonavigate.coordinates.clear();
+		if (navigate.coordinates != null) {
+			navigate.coordinates.clear();
 		}
-		cgeonavigate.coordinates = getCoordinates();
+		navigate.coordinates = getCoordinates();
 		activity.startActivity(navigateIntent);
 	}
 
@@ -1562,7 +1563,7 @@ public class cgeodetail extends Activity {
 		}
 
 		public void onClick(View arg0) {
-			Intent waypointIntent = new Intent(activity, cgeowaypoint.class);
+			Intent waypointIntent = new Intent(activity, waypointDetail.class);
 			waypointIntent.putExtra("waypoint", id);
 			waypointIntent.putExtra("geocode", cache.geocode);
 			activity.startActivity(waypointIntent);
@@ -1570,7 +1571,7 @@ public class cgeodetail extends Activity {
 	}
 
 	private void logVisit() {
-		Intent logVisitIntent = new Intent(activity, cgeovisit.class);
+		Intent logVisitIntent = new Intent(activity, cacheLog.class);
 		logVisitIntent.putExtra("id", cache.cacheid);
 		logVisitIntent.putExtra("geocode", cache.geocode.toUpperCase());
 		logVisitIntent.putExtra("type", cache.type.toLowerCase());
@@ -1583,7 +1584,7 @@ public class cgeodetail extends Activity {
 			warning.showToast(res.getString(R.string.err_detail_no_spoiler));
 		}
 
-		Intent spoilersIntent = new Intent(activity, cgeospoilers.class);
+		Intent spoilersIntent = new Intent(activity, spoilers.class);
 		spoilersIntent.putExtra("geocode", geocode.toUpperCase());
 		activity.startActivity(spoilersIntent);
 	}
@@ -1593,7 +1594,7 @@ public class cgeodetail extends Activity {
 			warning.showToast(res.getString(R.string.err_detail_no_map_static));
 		}
 
-		Intent smapsIntent = new Intent(activity, cgeosmaps.class);
+		Intent smapsIntent = new Intent(activity, mapStatic.class);
 		smapsIntent.putExtra("geocode", geocode.toUpperCase());
 		activity.startActivity(smapsIntent);
 	}
@@ -1658,9 +1659,9 @@ public class cgeodetail extends Activity {
 
 	private class selectTrackable implements View.OnClickListener {
 		public void onClick(View arg0) {
-			// show list of trackables
+			// show list of trackableList
 			try {
-				Intent trackablesIntent = new Intent(activity, cgeotrackables.class);
+				Intent trackablesIntent = new Intent(activity, trackableList.class);
 				trackablesIntent.putExtra("geocode", geocode.toUpperCase());
 				activity.startActivity(trackablesIntent);
 			} catch (Exception e) {
@@ -1786,7 +1787,7 @@ public class cgeodetail extends Activity {
 	private class addWaypoint implements View.OnClickListener {
 
 		public void onClick(View view) {
-			Intent addWptIntent = new Intent(activity, cgeowaypointadd.class);
+			Intent addWptIntent = new Intent(activity, waypointNew.class);
 
 			addWptIntent.putExtra("geocode", geocode);
 			int wpCount = 0;
@@ -1866,16 +1867,16 @@ public class cgeodetail extends Activity {
 			return;
 		}
 
-		Intent navigateIntent = new Intent(activity, cgeonavigate.class);
+		Intent navigateIntent = new Intent(activity, navigate.class);
 		navigateIntent.putExtra("latitude", cache.latitude);
 		navigateIntent.putExtra("longitude", cache.longitude);
 		navigateIntent.putExtra("geocode", cache.geocode.toUpperCase());
 		navigateIntent.putExtra("name", cache.name);
 
-		if (cgeonavigate.coordinates != null) {
-			cgeonavigate.coordinates.clear();
+		if (navigate.coordinates != null) {
+			navigate.coordinates.clear();
 		}
-		cgeonavigate.coordinates = getCoordinates();
+		navigate.coordinates = getCoordinates();
 		activity.startActivity(navigateIntent);
 	}
 }

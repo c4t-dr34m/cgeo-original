@@ -1,5 +1,6 @@
 package carnero.cgeo.original;
 
+import carnero.cgeo.original.libs.App;
 import carnero.cgeo.original.libs.Settings;
 import carnero.cgeo.original.libs.Base;
 import android.app.Activity;
@@ -11,7 +12,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
-public class cgeoabout extends Activity {
+public class about extends Activity {
 	private Activity activity = null;
 	private Resources res = null;
 	private Settings settings = null;
@@ -25,7 +26,7 @@ public class cgeoabout extends Activity {
 		activity = this;
 		res = this.getResources();
 		settings = new Settings(this, this.getSharedPreferences(Settings.preferences, 0));
-		base = new Base((cgeoapplication) this.getApplication(), settings, this.getSharedPreferences(Settings.preferences, 0));
+		base = new Base((App) this.getApplication(), settings, this.getSharedPreferences(Settings.preferences, 0));
 
 		// set layout
 		if (settings.skin == 1) {

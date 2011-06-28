@@ -1,5 +1,6 @@
 package carnero.cgeo.original;
 
+import carnero.cgeo.original.libs.App;
 import carnero.cgeo.original.libs.LogForm;
 import carnero.cgeo.original.models.Trackable;
 import carnero.cgeo.original.libs.Settings;
@@ -28,9 +29,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-public class cgeotouch extends LogForm {
+public class trackableLog extends LogForm {
 
-	private cgeoapplication app = null;
+	private App app = null;
 	private Activity activity = null;
 	private Resources res = null;
 	private LayoutInflater inflater = null;
@@ -125,7 +126,7 @@ public class cgeotouch extends LogForm {
 		// init
 		activity = this;
 		res = this.getResources();
-		app = (cgeoapplication) this.getApplication();
+		app = (App) this.getApplication();
 		settings = new Settings(this, getSharedPreferences(Settings.preferences, 0));
 		base = new Base(app, settings, getSharedPreferences(Settings.preferences, 0));
 		warning = new Warning(this);
@@ -345,7 +346,7 @@ public class cgeotouch extends LogForm {
 	private class cgeotouchDateListener implements View.OnClickListener {
 
 		public void onClick(View arg0) {
-			Dialog dateDialog = new cgeodate(activity, (cgeotouch) activity, date);
+			Dialog dateDialog = new date(activity, (trackableLog) activity, date);
 			dateDialog.setCancelable(true);
 			dateDialog.show();
 		}

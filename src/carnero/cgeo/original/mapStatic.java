@@ -1,5 +1,6 @@
 package carnero.cgeo.original;
 
+import carnero.cgeo.original.libs.App;
 import carnero.cgeo.original.libs.Settings;
 import carnero.cgeo.original.libs.Base;
 import carnero.cgeo.original.libs.Warning;
@@ -19,12 +20,12 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
-public class cgeosmaps extends Activity {
+public class mapStatic extends Activity {
 
 	private ArrayList<Bitmap> maps = new ArrayList<Bitmap>();
 	private String geocode = null;
 	private Resources res = null;
-	private cgeoapplication app = null;
+	private App app = null;
 	private Activity activity = null;
 	private Settings settings = null;
 	private Base base = null;
@@ -88,7 +89,7 @@ public class cgeosmaps extends Activity {
 		// init
 		activity = this;
 		res = this.getResources();
-		app = (cgeoapplication) this.getApplication();
+		app = (App) this.getApplication();
 		settings = new Settings(this, getSharedPreferences(Settings.preferences, 0));
 		base = new Base(app, settings, getSharedPreferences(Settings.preferences, 0));
 		warning = new Warning(this);

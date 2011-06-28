@@ -15,7 +15,7 @@ import android.util.Log;
 import carnero.cgeo.original.R;
 import carnero.cgeo.original.libs.Settings;
 import carnero.cgeo.original.models.User;
-import carnero.cgeo.original.cgeodetail;
+import carnero.cgeo.original.cacheDetail;
 import carnero.cgeo.original.mapinterfaces.ItemizedOverlayImpl;
 import carnero.cgeo.original.mapinterfaces.MapProjectionImpl;
 import carnero.cgeo.original.mapinterfaces.MapViewImpl;
@@ -174,7 +174,7 @@ public class UsersOverlay extends ItemizedOverlayBase implements OverlayBase {
 
 		public void onClick(DialogInterface dialog, int id) {
 			if (geocode != null) {
-				Intent detailIntent = new Intent(context, cgeodetail.class);
+				Intent detailIntent = new Intent(context, cacheDetail.class);
 				detailIntent.putExtra("geocode", geocode);
 				context.startActivity(detailIntent);
 			}

@@ -9,16 +9,16 @@ import android.widget.TextView;
 import android.widget.ArrayAdapter;
 import android.util.Log;
 import carnero.cgeo.original.R;
-import carnero.cgeo.original.cgeogpxes;
+import carnero.cgeo.original.gpxes;
 import java.io.File;
 
 public class GPXListAdapter extends ArrayAdapter<File> {
 	private GPXView holder = null;
-	private cgeogpxes parent = null;
+	private gpxes parent = null;
 	private Settings settings = null;
 	private LayoutInflater inflater = null;
 
-	public GPXListAdapter(cgeogpxes parentIn, Settings settingsIn, List<File> listIn) {
+	public GPXListAdapter(gpxes parentIn, Settings settingsIn, List<File> listIn) {
 		super(parentIn, 0, listIn);
 
 		parent = parentIn;

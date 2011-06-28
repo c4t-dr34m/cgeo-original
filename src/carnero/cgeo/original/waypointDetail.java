@@ -1,5 +1,6 @@
 package carnero.cgeo.original;
 
+import carnero.cgeo.original.libs.App;
 import carnero.cgeo.original.models.Waypoint;
 import carnero.cgeo.original.models.Coord;
 import carnero.cgeo.original.libs.Settings;
@@ -30,7 +31,7 @@ import android.widget.Button;
 import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 import java.util.ArrayList;
 
-public class cgeowaypoint extends Activity {
+public class waypointDetail extends Activity {
 
 	private static final int MENU_ID_EXTERN = 23;
 	private static final int MENU_ID_RMAPS = 21;
@@ -45,7 +46,7 @@ public class cgeowaypoint extends Activity {
 	private Waypoint waypoint = null;
 	private String geocode = null;
 	private int id = -1;
-	private cgeoapplication app = null;
+	private App app = null;
 	private Resources res = null;
 	private Activity activity = null;
 	private Settings settings = null;
@@ -130,7 +131,7 @@ public class cgeowaypoint extends Activity {
 		// init
 		activity = this;
 		res = this.getResources();
-		app = (cgeoapplication) this.getApplication();
+		app = (App) this.getApplication();
 		settings = new Settings(this, getSharedPreferences(Settings.preferences, 0));
 		base = new Base(app, settings, getSharedPreferences(Settings.preferences, 0));
 		warning = new Warning(this);
@@ -239,7 +240,7 @@ public class cgeowaypoint extends Activity {
 		subMenu.add(0, MENU_ID_EXTERN, 0, res.getString(R.string.cache_menu_map_ext)); // ext.: other
 		subMenu.add(0, MENU_ID_TURNBYTURN, 0, res.getString(R.string.cache_menu_tbt)); // turn-by-turn
 
-		menu.add(0, MENU_ID_CACHES_AROUND, 0, res.getString(R.string.cache_menu_around)).setIcon(android.R.drawable.ic_menu_rotate); // caches around
+		menu.add(0, MENU_ID_CACHES_AROUND, 0, res.getString(R.string.cache_menu_around)).setIcon(android.R.drawable.ic_menu_rotate); // cacheList around
 
 		return true;
 	}
@@ -360,7 +361,7 @@ public class cgeowaypoint extends Activity {
 			warning.showToast(res.getString(R.string.err_location_unknown));
 		}
 
-		cgeocaches cachesActivity = new cgeocaches();
+		cacheList cachesActivity = new cacheList();
 
 		Intent cachesIntent = new Intent(activity, cachesActivity.getClass());
 		cachesIntent.putExtra("type", "coordinate");
@@ -404,7 +405,7 @@ public class cgeowaypoint extends Activity {
 		}
 
 		public void onClick(View arg0) {
-			Intent editIntent = new Intent(activity, cgeowaypointadd.class);
+			Intent editIntent = new Intent(activity, waypointNew.class);
 			editIntent.putExtra("waypoint", id);
 			activity.startActivity(editIntent);
 		}
@@ -439,17 +440,17 @@ public class cgeowaypoint extends Activity {
 			warning.showToast(res.getString(R.string.err_location_unknown));
 		}
 
-		Intent navigateIntent = new Intent(activity, cgeonavigate.class);
+		Intent navigateIntent = new Intent(activity, navigate.class);
 		navigateIntent.putExtra("latitude", waypoint.latitude);
 		navigateIntent.putExtra("longitude", waypoint.longitude);
 		navigateIntent.putExtra("geocode", waypoint.prefix.trim() + "/" + waypoint.lookup.trim());
 		navigateIntent.putExtra("name", waypoint.name);
 
-		if (cgeonavigate.coordinates != null) {
-			cgeonavigate.coordinates.clear();
+		if (navigate.coordinates != null) {
+			navigate.coordinates.clear();
 		}
-		cgeonavigate.coordinates = new ArrayList<Coord>();
-		cgeonavigate.coordinates.add(new Coord(waypoint));
+		navigate.coordinates = new ArrayList<Coord>();
+		navigate.coordinates.add(new Coord(waypoint));
 		activity.startActivity(navigateIntent);
 	}
 }

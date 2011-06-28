@@ -1,5 +1,6 @@
 package carnero.cgeo.original;
 
+import carnero.cgeo.original.libs.App;
 import carnero.cgeo.original.libs.Compass;
 import carnero.cgeo.original.models.Coord;
 import carnero.cgeo.original.libs.Settings;
@@ -30,11 +31,11 @@ import android.view.WindowManager;
 import java.util.HashMap;
 import java.util.Locale;
 
-public class cgeonavigate extends Activity {
+public class navigate extends Activity {
 
 	public static ArrayList<Coord> coordinates = new ArrayList<Coord>();
 	private Resources res = null;
-	private cgeoapplication app = null;
+	private App app = null;
 	private Activity activity = null;
 	private Settings settings = null;
 	private Base base = null;
@@ -79,7 +80,7 @@ public class cgeonavigate extends Activity {
 		// class init
 		activity = this;
 		res = this.getResources();
-		app = (cgeoapplication) this.getApplication();
+		app = (App) this.getApplication();
 		settings = new Settings(this, getSharedPreferences(Settings.preferences, 0));
 		base = new Base(app, settings, getSharedPreferences(Settings.preferences, 0));
 		warning = new Warning(this);
@@ -121,7 +122,7 @@ public class cgeonavigate extends Activity {
 				}
 			}
 		} else {
-			Intent pointIntent = new Intent(activity, cgeopoint.class);
+			Intent pointIntent = new Intent(activity, point.class);
 			activity.startActivity(pointIntent);
 
 			finish();
@@ -299,7 +300,7 @@ public class cgeonavigate extends Activity {
 				prefsEdit.commit();
 			}
 		} else if (id == 2) {
-			Intent pointIntent = new Intent(activity, cgeopoint.class);
+			Intent pointIntent = new Intent(activity, point.class);
 			activity.startActivity(pointIntent);
 
 			finish();

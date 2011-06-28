@@ -1,5 +1,6 @@
 package carnero.cgeo.original;
 
+import carnero.cgeo.original.libs.App;
 import carnero.cgeo.original.libs.GPXListAdapter;
 import carnero.cgeo.original.libs.Settings;
 import carnero.cgeo.original.libs.Base;
@@ -18,10 +19,10 @@ import android.view.View;
 import java.io.File;
 import java.util.ArrayList;
 
-public class cgeogpxes extends ListActivity {
+public class gpxes extends ListActivity {
 
 	private ArrayList<File> files = new ArrayList<File>();
-	private cgeoapplication app = null;
+	private App app = null;
 	private Settings settings = null;
 	private Base base = null;
 	private Warning warning = null;
@@ -109,7 +110,7 @@ public class cgeogpxes extends ListActivity {
 		// init
 		activity = this;
 		res = this.getResources();
-		app = (cgeoapplication) this.getApplication();
+		app = (App) this.getApplication();
 		settings = new Settings(this, getSharedPreferences(Settings.preferences, 0));
 		base = new Base(app, settings, getSharedPreferences(Settings.preferences, 0));
 		warning = new Warning(this);

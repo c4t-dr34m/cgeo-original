@@ -1,5 +1,6 @@
 package carnero.cgeo.original;
 
+import carnero.cgeo.original.libs.App;
 import carnero.cgeo.original.comparators.CachePopularityComparator;
 import carnero.cgeo.original.libs.SearchThread;
 import carnero.cgeo.original.libs.Base;
@@ -59,7 +60,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.util.Locale;
 
-public class cgeocaches extends ListActivity {
+public class cacheList extends ListActivity {
 
 	private GoogleAnalyticsTracker tracker = null;
 	private String action = null;
@@ -72,7 +73,7 @@ public class cgeocaches extends ListActivity {
 	private String username = null;
 	private Long searchId = null;
 	private ArrayList<Cache> cacheList = new ArrayList<Cache>();
-	private cgeoapplication app = null;
+	private App app = null;
 	private Resources res = null;
 	private static Activity activity = null;
 	private CacheListAdapter adapter = null;
@@ -363,7 +364,7 @@ public class cgeocaches extends ListActivity {
 		// init
 		activity = this;
 		res = this.getResources();
-		app = (cgeoapplication) this.getApplication();
+		app = (App) this.getApplication();
 		app.setAction(action);
 		settings = new Settings(this, getSharedPreferences(Settings.preferences, 0));
 		base = new Base(app, settings, getSharedPreferences(Settings.preferences, 0));
@@ -609,21 +610,21 @@ public class cgeocaches extends ListActivity {
 		menu.add(0, 9, 0, res.getString(R.string.caches_select_invert)).setIcon(android.R.drawable.ic_menu_agenda);
 		if (type.equals("offline") == true) {
 			SubMenu subMenu = menu.addSubMenu(0, 103, 0, res.getString(R.string.caches_manage)).setIcon(android.R.drawable.ic_menu_save);
-			subMenu.add(0, 5, 0, res.getString(R.string.caches_drop_all)); // delete saved caches
-			subMenu.add(0, 1, 0, res.getString(R.string.cache_offline_refresh)); // download details for all caches
+			subMenu.add(0, 5, 0, res.getString(R.string.caches_drop_all)); // delete saved cacheList
+			subMenu.add(0, 1, 0, res.getString(R.string.cache_offline_refresh)); // download details for all cacheList
 			menu.add(0, 6, 0, res.getString(R.string.gpx_import_title)).setIcon(android.R.drawable.ic_menu_upload); // import gpx file
 		} else {
-			menu.add(0, 1, 0, res.getString(R.string.caches_store_offline)).setIcon(android.R.drawable.ic_menu_set_as); // download details for all caches
+			menu.add(0, 1, 0, res.getString(R.string.caches_store_offline)).setIcon(android.R.drawable.ic_menu_set_as); // download details for all cacheList
 		}
 
 		final Intent intentTest = new Intent(Intent.ACTION_VIEW);
 		intentTest.setData(Uri.parse("menion.points:x"));
 		if (Base.isIntentAvailable(activity, intentTest) == true) {
 			SubMenu subMenu = menu.addSubMenu(0, 101, 0, res.getString(R.string.caches_on_map)).setIcon(android.R.drawable.ic_menu_mapmode);
-			subMenu.add(0, 2, 0, res.getString(R.string.caches_map_cgeo)); // show all caches on map using c:geo
-			subMenu.add(0, 3, 0, res.getString(R.string.caches_map_locus)); // show all caches on map using Locus
+			subMenu.add(0, 2, 0, res.getString(R.string.caches_map_cgeo)); // show all cacheList on map using c:geo
+			subMenu.add(0, 3, 0, res.getString(R.string.caches_map_locus)); // show all cacheList on map using Locus
 		} else {
-			menu.add(0, 2, 0, res.getString(R.string.caches_on_map)).setIcon(android.R.drawable.ic_menu_mapmode); // show all caches on map
+			menu.add(0, 2, 0, res.getString(R.string.caches_on_map)).setIcon(android.R.drawable.ic_menu_mapmode); // show all cacheList on map
 		}
 
 		if (type.equals("offline") == true) {
@@ -674,7 +675,7 @@ public class cgeocaches extends ListActivity {
 				}
 			}
 
-			if (type != null && type.equals("offline") == false && (cacheList != null && app != null && cacheList.size() >= app.getTotal(searchId))) { // there are no more caches
+			if (type != null && type.equals("offline") == false && (cacheList != null && app != null && cacheList.size() >= app.getTotal(searchId))) { // there are no more cacheList
 				menu.findItem(0).setEnabled(false);
 			} else {
 				menu.findItem(0).setEnabled(true);
@@ -934,7 +935,7 @@ public class cgeocaches extends ListActivity {
 		final Cache cache = adapter.getItem(touchedPos);
 
 		if (id == 1) { // compass
-			Intent navigateIntent = new Intent(activity, cgeonavigate.class);
+			Intent navigateIntent = new Intent(activity, navigate.class);
 			navigateIntent.putExtra("latitude", cache.latitude);
 			navigateIntent.putExtra("longitude", cache.longitude);
 			navigateIntent.putExtra("geocode", cache.geocode.toUpperCase());
@@ -1003,13 +1004,13 @@ public class cgeocaches extends ListActivity {
 			}
 
 			return true;
-		} else if (id == 6) { // log visit
+		} else if (id == 6) { // log cacheLog
 			if (cache.cacheid == null || cache.cacheid.length() == 0) {
 				warning.showToast(res.getString(R.string.err_cannot_log_visit));
 				return true;
 			}
 
-			Intent logVisitIntent = new Intent(activity, cgeovisit.class);
+			Intent logVisitIntent = new Intent(activity, cacheLog.class);
 			logVisitIntent.putExtra("id", cache.cacheid);
 			logVisitIntent.putExtra("geocode", cache.geocode.toUpperCase());
 			logVisitIntent.putExtra("type", cache.type.toLowerCase());
@@ -1018,7 +1019,7 @@ public class cgeocaches extends ListActivity {
 
 			return true;
 		} else if (id == 7) { // cache details
-			Intent cachesIntent = new Intent(activity, cgeodetail.class);
+			Intent cachesIntent = new Intent(activity, cacheDetail.class);
 			cachesIntent.putExtra("geocode", cache.geocode.toUpperCase());
 			cachesIntent.putExtra("name", cache.name);
 			activity.startActivity(cachesIntent);
@@ -1274,7 +1275,7 @@ public class cgeocaches extends ListActivity {
 	}
 
 	private void importGpx() {
-		final Intent intent = new Intent(activity, cgeogpxes.class);
+		final Intent intent = new Intent(activity, gpxes.class);
 		intent.putExtra("list", listId);
 		activity.startActivity(intent);
 
@@ -1283,10 +1284,10 @@ public class cgeocaches extends ListActivity {
 
 	public void refreshStored() {
 		if (adapter != null && adapter.getChecked() > 0) {
-			// there are some checked caches
+			// there are some checked cacheList
 			detailTotal = adapter.getChecked();
 		} else {
-			// no checked caches, download everything (when already stored - refresh them)
+			// no checked cacheList, download everything (when already stored - refresh them)
 			detailTotal = cacheList.size();
 		}
 		detailProgress = 0;

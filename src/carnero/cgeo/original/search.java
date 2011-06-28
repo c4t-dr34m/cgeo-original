@@ -1,5 +1,6 @@
 package carnero.cgeo.original;
 
+import carnero.cgeo.original.libs.App;
 import carnero.cgeo.original.libs.Settings;
 import carnero.cgeo.original.libs.Base;
 import carnero.cgeo.original.libs.UpdateLoc;
@@ -26,11 +27,11 @@ import android.widget.AutoCompleteTextView;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class cgeoadvsearch extends Activity {
+public class search extends Activity {
 
 	private Resources res = null;
 	private Activity activity = null;
-	private cgeoapplication app = null;
+	private App app = null;
 	private Settings settings = null;
 	private Base base = null;
 	private Warning warning = null;
@@ -47,7 +48,7 @@ public class cgeoadvsearch extends Activity {
 		// init
 		activity = this;
 		res = this.getResources();
-		app = (cgeoapplication) this.getApplication();
+		app = (App) this.getApplication();
 		app.setAction(null);
 		settings = new Settings(this, getSharedPreferences(Settings.preferences, 0));
 		base = new Base(app, settings, getSharedPreferences(Settings.preferences, 0));
@@ -133,19 +134,19 @@ public class cgeoadvsearch extends Activity {
 
 		try {
 			if (gcCodeM.find()) { // GC-code
-				final Intent cachesIntent = new Intent(activity, cgeodetail.class);
+				final Intent cachesIntent = new Intent(activity, cacheDetail.class);
 				cachesIntent.putExtra("geocode", query.trim().toUpperCase());
 				activity.startActivity(cachesIntent);
 
 				found = true;
 			} else if (tbCodeM.find()) { // TB-code
-				final Intent trackablesIntent = new Intent(activity, cgeotrackable.class);
+				final Intent trackablesIntent = new Intent(activity, trackableDetail.class);
 				trackablesIntent.putExtra("geocode", query.trim().toUpperCase());
 				activity.startActivity(trackablesIntent);
 
 				found = true;
 			} else { // keyword (fallback)
-				final Intent cachesIntent = new Intent(activity, cgeocaches.class);
+				final Intent cachesIntent = new Intent(activity, cacheList.class);
 				cachesIntent.putExtra("type", "keyword");
 				cachesIntent.putExtra("keyword", query);
 				cachesIntent.putExtra("cachetype", settings.cacheType);
@@ -212,7 +213,7 @@ public class cgeoadvsearch extends Activity {
 
 		EditText trackable = (EditText) findViewById(R.id.trackable);
 		trackable.setOnEditorActionListener(new findTrackableAction());
-		// trackable.addTextChangedListener(new UpperCaseTextWatcher(trackable)); // not working with HTC IMEs.
+		// trackableDetail.addTextChangedListener(new UpperCaseTextWatcher(trackableDetail)); // not working with HTC IMEs.
 
 		final Button displayTrackable = (Button) findViewById(R.id.display_trackable);
 		displayTrackable.setOnClickListener(new findTrackableListener());
@@ -323,7 +324,7 @@ public class cgeoadvsearch extends Activity {
 				return;
 			}
 
-			final Intent cachesIntent = new Intent(activity, cgeocaches.class);
+			final Intent cachesIntent = new Intent(activity, cacheList.class);
 			cachesIntent.putExtra("type", "coordinate");
 			cachesIntent.putExtra("latitude", (Double) latParsed.get("coordinate"));
 			cachesIntent.putExtra("longitude", (Double) lonParsed.get("coordinate"));
@@ -353,7 +354,7 @@ public class cgeoadvsearch extends Activity {
 	}
 
 	private void findByKeywordFn() {
-		// find caches by coordinates
+		// find cacheList by coordinates
 		String keyText = ((EditText) findViewById(R.id.keyword)).getText().toString();
 
 		if (keyText == null || keyText.length() == 0) {
@@ -361,7 +362,7 @@ public class cgeoadvsearch extends Activity {
 			return;
 		}
 
-		final Intent cachesIntent = new Intent(activity, cgeocaches.class);
+		final Intent cachesIntent = new Intent(activity, cacheList.class);
 		cachesIntent.putExtra("type", "keyword");
 		cachesIntent.putExtra("keyword", keyText);
 		cachesIntent.putExtra("cachetype", settings.cacheType);
@@ -396,7 +397,7 @@ public class cgeoadvsearch extends Activity {
 			return;
 		}
 
-		final Intent addressesIntent = new Intent(activity, cgeoaddresses.class);
+		final Intent addressesIntent = new Intent(activity, addresses.class);
 		addressesIntent.putExtra("keyword", addText);
 		activity.startActivity(addressesIntent);
 	}
@@ -429,7 +430,7 @@ public class cgeoadvsearch extends Activity {
 			return;
 		}
 
-		final Intent cachesIntent = new Intent(activity, cgeocaches.class);
+		final Intent cachesIntent = new Intent(activity, cacheList.class);
 		cachesIntent.putExtra("type", "username");
 		cachesIntent.putExtra("username", usernameText);
 		cachesIntent.putExtra("cachetype", settings.cacheType);
@@ -464,7 +465,7 @@ public class cgeoadvsearch extends Activity {
 			return;
 		}
 
-		final Intent cachesIntent = new Intent(activity, cgeocaches.class);
+		final Intent cachesIntent = new Intent(activity, cacheList.class);
 		cachesIntent.putExtra("type", "owner");
 		cachesIntent.putExtra("username", usernameText);
 		cachesIntent.putExtra("cachetype", settings.cacheType);
@@ -499,7 +500,7 @@ public class cgeoadvsearch extends Activity {
 			return;
 		}
 
-		final Intent cachesIntent = new Intent(activity, cgeodetail.class);
+		final Intent cachesIntent = new Intent(activity, cacheDetail.class);
 		cachesIntent.putExtra("geocode", geocodeText.toUpperCase());
 		activity.startActivity(cachesIntent);
 	}
@@ -532,7 +533,7 @@ public class cgeoadvsearch extends Activity {
 			return;
 		}
 
-		final Intent trackablesIntent = new Intent(activity, cgeotrackable.class);
+		final Intent trackablesIntent = new Intent(activity, trackableDetail.class);
 		trackablesIntent.putExtra("geocode", trackableText.toUpperCase());
 		activity.startActivity(trackablesIntent);
 	}

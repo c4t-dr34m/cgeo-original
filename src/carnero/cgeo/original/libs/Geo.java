@@ -9,7 +9,6 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
-import carnero.cgeo.original.cgeoapplication;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
@@ -17,7 +16,7 @@ import java.util.Locale;
 public class Geo {
 
 	private Context context = null;
-	private cgeoapplication app = null;
+	private App app = null;
 	private LocationManager geoManager = null;
 	private UpdateLoc geoUpdate = null;
 	private Warning warning = null;
@@ -49,7 +48,7 @@ public class Geo {
 	public Integer satellitesFixed = null;
 	public double distanceNow = 0d;
 
-	public Geo(Context contextIn, cgeoapplication appIn, UpdateLoc geoUpdateIn, Base baseIn, Settings settingsIn, Warning warningIn, int timeIn, int distanceIn) {
+	public Geo(Context contextIn, App appIn, UpdateLoc geoUpdateIn, Base baseIn, Settings settingsIn, Warning warningIn, int timeIn, int distanceIn) {
 		context = contextIn;
 		app = appIn;
 		geoUpdate = geoUpdateIn;

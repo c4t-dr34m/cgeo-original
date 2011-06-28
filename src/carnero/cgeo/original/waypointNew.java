@@ -1,5 +1,6 @@
 package carnero.cgeo.original;
 
+import carnero.cgeo.original.libs.App;
 import carnero.cgeo.original.models.Waypoint;
 import carnero.cgeo.original.libs.Settings;
 import carnero.cgeo.original.libs.Base;
@@ -24,9 +25,9 @@ import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class cgeowaypointadd extends Activity {
+public class waypointNew extends Activity {
 
-	private cgeoapplication app = null;
+	private App app = null;
 	private Resources res = null;
 	private Settings settings = null;
 	private Base base = null;
@@ -94,7 +95,7 @@ public class cgeowaypointadd extends Activity {
 		// init
 		activity = this;
 		res = this.getResources();
-		app = (cgeoapplication) this.getApplication();
+		app = (App) this.getApplication();
 		settings = new Settings(activity, activity.getSharedPreferences(Settings.preferences, 0));
 		base = new Base(app, settings, activity.getSharedPreferences(Settings.preferences, 0));
 		warning = new Warning(activity);

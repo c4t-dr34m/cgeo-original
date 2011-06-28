@@ -1,16 +1,22 @@
-package carnero.cgeo.original.mapcommon;
+package carnero.cgeo.original;
 
-import carnero.cgeo.original.R;
 import carnero.cgeo.original.libs.Base;
 import carnero.cgeo.original.models.Cache;
 import carnero.cgeo.original.models.Coord;
 import carnero.cgeo.original.libs.Direction;
 import carnero.cgeo.original.libs.Geo;
 import carnero.cgeo.original.libs.Settings;
-import carnero.cgeo.original.models.User;
 import carnero.cgeo.original.libs.Warning;
+import carnero.cgeo.original.libs.App;
+import carnero.cgeo.original.libs.UpdateDir;
+import carnero.cgeo.original.libs.UpdateLoc;
+import carnero.cgeo.original.models.User;
 import carnero.cgeo.original.models.Waypoint;
-import carnero.cgeo.original.cgeoapplication;
+import carnero.cgeo.original.mapcommon.MapBase;
+import carnero.cgeo.original.mapcommon.MapMyOverlay;
+import carnero.cgeo.original.mapcommon.MapOverlay;
+import carnero.cgeo.original.mapcommon.OverlayScale;
+import carnero.cgeo.original.mapcommon.UsersOverlay;
 import carnero.cgeo.original.mapinterfaces.ActivityImpl;
 import carnero.cgeo.original.mapinterfaces.CacheOverlayItemImpl;
 import carnero.cgeo.original.mapinterfaces.GeoPointImpl;
@@ -35,12 +41,10 @@ import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
-import carnero.cgeo.original.libs.UpdateDir;
-import carnero.cgeo.original.libs.UpdateLoc;
 import java.util.HashMap;
 import java.util.Locale;
 
-public class cgeomap extends MapBase {
+public class map extends MapBase {
 
 	private Resources res = null;
 	private Activity activity = null;
@@ -49,7 +53,7 @@ public class cgeomap extends MapBase {
 	private Settings settings = null;
 	private Base base = null;
 	private Warning warning = null;
-	private cgeoapplication app = null;
+	private App app = null;
 	private SharedPreferences.Editor prefsEdit = null;
 	private Geo geo = null;
 	private Direction dir = null;
@@ -201,7 +205,7 @@ public class cgeomap extends MapBase {
 		}
 	};
 
-	public cgeomap(ActivityImpl activity) {
+	public map(ActivityImpl activity) {
 		super(activity);
 	}
 
@@ -212,7 +216,7 @@ public class cgeomap extends MapBase {
 		// class init
 		res = this.getResources();
 		activity = this.getActivity();
-		app = (cgeoapplication) activity.getApplication();
+		app = (App) activity.getApplication();
 		app.setAction(null);
 		settings = new Settings(activity, activity.getSharedPreferences(Settings.preferences, 0));
 		base = new Base(app, settings, activity.getSharedPreferences(Settings.preferences, 0));

@@ -16,10 +16,10 @@ import android.util.Log;
 import carnero.cgeo.original.libs.Base;
 import carnero.cgeo.original.models.Coord;
 import carnero.cgeo.original.libs.Settings;
-import carnero.cgeo.original.cgeodetail;
-import carnero.cgeo.original.cgeonavigate;
-import carnero.cgeo.original.cgeopopup;
-import carnero.cgeo.original.cgeowaypoint;
+import carnero.cgeo.original.cacheDetail;
+import carnero.cgeo.original.navigate;
+import carnero.cgeo.original.mapPopup;
+import carnero.cgeo.original.waypointDetail;
 import carnero.cgeo.original.mapinterfaces.GeoPointImpl;
 import carnero.cgeo.original.mapinterfaces.ItemizedOverlayImpl;
 import carnero.cgeo.original.mapinterfaces.MapFactory;
@@ -98,14 +98,14 @@ public class MapOverlay extends ItemizedOverlayBase implements OverlayBase {
 			Coord coordinate = item.getCoord();
 
 			if (coordinate.type != null && coordinate.type.equalsIgnoreCase("cache") == true && coordinate.geocode != null && coordinate.geocode.length() > 0) {
-				Intent popupIntent = new Intent(context, cgeopopup.class);
+				Intent popupIntent = new Intent(context, mapPopup.class);
 
 				popupIntent.putExtra("fromdetail", fromDetail);
 				popupIntent.putExtra("geocode", coordinate.geocode);
 
 				context.startActivity(popupIntent);
 			} else if (coordinate.type != null && coordinate.type.equalsIgnoreCase("waypoint") == true && coordinate.id != null && coordinate.id > 0) {
-				Intent popupIntent = new Intent(context, cgeowaypoint.class);
+				Intent popupIntent = new Intent(context, waypointDetail.class);
 
 				popupIntent.putExtra("waypoint", coordinate.id);
 				popupIntent.putExtra("geocode", coordinate.geocode);
@@ -174,7 +174,7 @@ public class MapOverlay extends ItemizedOverlayBase implements OverlayBase {
 					dialog.setPositiveButton("detail", new DialogInterface.OnClickListener() {
 
 						public void onClick(DialogInterface dialog, int id) {
-							Intent cachesIntent = new Intent(context, cgeodetail.class);
+							Intent cachesIntent = new Intent(context, cacheDetail.class);
 							cachesIntent.putExtra("geocode", coordinate.geocode.toUpperCase());
 							context.startActivity(cachesIntent);
 
@@ -185,10 +185,10 @@ public class MapOverlay extends ItemizedOverlayBase implements OverlayBase {
 					dialog.setPositiveButton("navigate", new DialogInterface.OnClickListener() {
 
 						public void onClick(DialogInterface dialog, int id) {
-							cgeonavigate navigateActivity = new cgeonavigate();
+							navigate navigateActivity = new navigate();
 
-							cgeonavigate.coordinates = new ArrayList<Coord>();
-							cgeonavigate.coordinates.add(coordinate);
+							navigate.coordinates = new ArrayList<Coord>();
+							navigate.coordinates.add(coordinate);
 
 							Intent navigateIntent = new Intent(context, navigateActivity.getClass());
 							navigateIntent.putExtra("latitude", coordinate.latitude);
@@ -213,10 +213,10 @@ public class MapOverlay extends ItemizedOverlayBase implements OverlayBase {
 				dialog.setPositiveButton("navigate", new DialogInterface.OnClickListener() {
 
 					public void onClick(DialogInterface dialog, int id) {
-						cgeonavigate navigateActivity = new cgeonavigate();
+						navigate navigateActivity = new navigate();
 
-						cgeonavigate.coordinates = new ArrayList<Coord>();
-						cgeonavigate.coordinates.add(coordinate);
+						navigate.coordinates = new ArrayList<Coord>();
+						navigate.coordinates.add(coordinate);
 
 						Intent navigateIntent = new Intent(context, navigateActivity.getClass());
 						navigateIntent.putExtra("latitude", coordinate.latitude);
