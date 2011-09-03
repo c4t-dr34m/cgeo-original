@@ -110,6 +110,7 @@ public class Base {
 	public static SimpleDateFormat dateTbIn2 = new SimpleDateFormat("EEEEE, MMMMM dd, yyyy", Locale.ENGLISH); // Saturday, March 28, 2009
 	public static SimpleDateFormat dateSqlIn = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); // 2010-07-25 14:44:01
 	public static SimpleDateFormat dateGPXIn = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'"); // 2010-04-20T07:00:00Z
+	public static SimpleDateFormat dateLogIn = new SimpleDateFormat("dd/MM/yyyy"); // 30/09/2011
 	public static DateFormat dateOut = DateFormat.getDateInstance(DateFormat.LONG, Locale.getDefault());
 	public static DateFormat timeOut = DateFormat.getTimeInstance(DateFormat.SHORT, Locale.getDefault());
 	public static DateFormat dateOutShort = DateFormat.getDateInstance(DateFormat.SHORT, Locale.getDefault());
@@ -1088,8 +1089,39 @@ public class Base {
 		final Pattern patternDesc = Pattern.compile("<div class=\"UserSuppliedContent\">[^<]*<span id=\"ctl00_ContentBody_LongDescription\"[^>]*>((?:(?!</span>[^\\w^<]*</div>).)*)</span>[^<]*</div>[^<]*<p>[^<]*</p>[^<]*<p>[^<]*<strong>[^\\w]*Additional Hints</strong>", Pattern.CASE_INSENSITIVE);
 		final Pattern patternCountLogs = Pattern.compile("<span id=\"ctl00_ContentBody_lblFindCounts\"><p>(.*)<\\/p><\\/span>", Pattern.CASE_INSENSITIVE);
 		final Pattern patternCountLog = Pattern.compile(" src=\"\\/images\\/icons\\/([^\\.]*).gif\" alt=\"[^\"]*\" title=\"[^\"]*\" />([0-9]*)[^0-9]+", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
-		final Pattern patternLogs = Pattern.compile("<table class=\"LogsTable[^\"]*\"[^>]*>[^<]*<tr>(.*)</tr>[^<]*</table>[^<]*<p", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
-		final Pattern patternLog = Pattern.compile("<td[^>]*>[^<]*<strong>[^<]*<img src=\"[^\"]*/images/icons/([^\\.]+)\\.[a-z]{2,5}\"[^>]*>&nbsp;([a-zA-Z]+) (\\d+)(, (\\d+))? by <a href=[^>]+>([^<]+)</a>[<^]*</strong>([^\\(]*\\((\\d+) found\\))?(<br[^>]*>)+((?:(?!<small>).)*)(<br[^>]*>)+<small>", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
+		final Pattern patternLogs = Pattern.compile("<table class=\"LogsTable[^\"]*\"[^>]*>((?:(?!</table>).)*)</table>[^<]*<p", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
+		/*
+		 * <tr>
+		 * <td class="Nothing">
+		 * <div class="FloatLeft LogDisplayLeft">
+		 * <p class="logOwnerProfileName">
+		 * <strong><a href="/profile/?guid=96c94662-f2c9-450a-99ef-4c034dcde72b" id="184034162">CERV.cz</a></strong>
+		 * </p>
+		 * <p class="logOwnerBadge"><img src='/images/icons/prem_user.gif' title='Premium Member' /> Premium Member</p>
+		 * <p class="logOwnerAvatar"><a href="/profile/?guid=96c94662-f2c9-450a-99ef-4c034dcde72b"><img src="/images/default_avatar.jpg" height='48' width='48' /></a></p>
+		 * <p class="logOwnerStats">
+		 * <img src="/images/icons/icon_smile.png" title="Caches Found" /> 567</div>
+		 * <div class="FloatLeft LogDisplayRight">
+		 * <div class="HalfLeft LogType">
+		 * <strong><img src="http://www.geocaching.com/images/icons/icon_smile.gif" alt="Found it" title="Found it" />&nbsp;Found it</strong>
+		 * </div>
+		 * <div class="HalfRight AlignRight">
+		 * <span class="minorDetails LogDate">09/03/2011</span>
+		 * </div>
+		 * <div class="Clear LogContent">
+		 * <p class="LogText">13:29 diky za kes!</p>
+		 * <div class="AlignRight">
+		 * <small><a href="log.aspx?LUID=8da01276-7881-4ec9-8d23-8938d7f2984e" title="View Log">View Log</a></small>
+		 * </div></div></div>
+		 * </td>
+		 * </tr>
+		 */
+		final Pattern patternLogUser = Pattern.compile("<p class=\"logOwnerProfileName\">[^<]*<strong>[^<]*<a[^>]*>([^<]+)</a>[^<]*</strong>[^<]*</p>", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
+		final Pattern patternLogFounds = Pattern.compile("<p class=\"logOwnerStats\"><img[^>]*>[^\\d]*(\\d+)[^<]*</div>", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
+		final Pattern patternLogIcon = Pattern.compile("<strong>[^<]*<img src=\"[^\"]*/images/icons/([^\"]+)\\.gif\"[^>]*>[^<]+</strong>", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
+		final Pattern patternLogDate = Pattern.compile("<span class=\"minorDetails LogDate\">([0-9]+/[0-9]+/[0-9]+)[^<]*</span>", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
+		final Pattern patternLogText = Pattern.compile("<p class=\"LogText\">((?:(?!</p>).)*)</p>", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
+
 		final Pattern patternAttributes = Pattern.compile("<h3 class=\"WidgetHeader\">[^<]*<img[^>]+>[^\\w]*Attributes[^<]*</h3>[^<]*<div class=\"WidgetBody\">(([^<]*<img src=\"[^\"]+\" alt=\"[^\"]+\"[^>]*>)+)[^<]*<p", Pattern.CASE_INSENSITIVE);
 		final Pattern patternAttributesInside = Pattern.compile("[^<]*<img src=\"([^\"]+)\" alt=\"([^\"]+)\"[^>]*>", Pattern.CASE_INSENSITIVE);
 		final Pattern patternSpoilers = Pattern.compile("<span id=\"ctl00_ContentBody_Images\">((<a href=\"[^\"]+\"[^>]*>[^<]*<img[^>]+>[^<]*<span>[^>]+</span>[^<]*</a>[^<]*<br[^>]*>([^<]*(<br[^>]*>)+)?)+)[^<]*</span>", Pattern.CASE_INSENSITIVE);
@@ -1571,93 +1603,50 @@ public class Base {
 					final int logsCnt = logs.length;
 
 					for (int k = 0; k < logsCnt; k++) {
-						final Matcher matcherLog = patternLog.matcher(logs[k]);
-
-						if (matcherLog.find()) {
-							final CacheLog logDone = new CacheLog();
-
-							String logTmp = matcherLog.group(10);
-
-							int day = -1;
+						final CacheLog logDone = new CacheLog();
+						Matcher matcher;
+						
+						matcher = patternLogUser.matcher(logs[k]);
+						if (matcher.find() && matcher.groupCount() > 0) {
+							logDone.author = matcher.group(1).trim();
+							logDone.author = Html.fromHtml(logDone.author).toString();
+						}
+						
+						matcher = patternLogFounds.matcher(logs[k]);
+						if (matcher.find() && matcher.groupCount() > 0) {
 							try {
-								day = Integer.parseInt(matcherLog.group(3));
+								logDone.found = Integer.parseInt(matcher.group(1).trim());
 							} catch (Exception e) {
-								Log.w(Settings.tag, "Failed to parse logs date (day): " + e.toString());
+								// NaN
 							}
-
-							int month = -1;
-							// January  | February  | March  | April  | May | June | July | August  | September | October  | November  | December
-							if (matcherLog.group(2).equalsIgnoreCase("January")) {
-								month = 0;
-							} else if (matcherLog.group(2).equalsIgnoreCase("February")) {
-								month = 1;
-							} else if (matcherLog.group(2).equalsIgnoreCase("March")) {
-								month = 2;
-							} else if (matcherLog.group(2).equalsIgnoreCase("April")) {
-								month = 3;
-							} else if (matcherLog.group(2).equalsIgnoreCase("May")) {
-								month = 4;
-							} else if (matcherLog.group(2).equalsIgnoreCase("June")) {
-								month = 5;
-							} else if (matcherLog.group(2).equalsIgnoreCase("July")) {
-								month = 6;
-							} else if (matcherLog.group(2).equalsIgnoreCase("August")) {
-								month = 7;
-							} else if (matcherLog.group(2).equalsIgnoreCase("September")) {
-								month = 8;
-							} else if (matcherLog.group(2).equalsIgnoreCase("October")) {
-								month = 9;
-							} else if (matcherLog.group(2).equalsIgnoreCase("November")) {
-								month = 10;
-							} else if (matcherLog.group(2).equalsIgnoreCase("December")) {
-								month = 11;
-							} else {
-								Log.w(Settings.tag, "Failed to parse logs date (month).");
-							}
-
-
-							int year = -1;
-							final String yearPre = matcherLog.group(5);
-
-							if (yearPre == null) {
-								Calendar date = Calendar.getInstance();
-								year = date.get(Calendar.YEAR);
-							} else {
-								try {
-									year = Integer.parseInt(matcherLog.group(5));
-								} catch (Exception e) {
-									Log.w(Settings.tag, "Failed to parse logs date (year): " + e.toString());
-								}
-							}
-
-							long logDate;
-							if (year > 0 && month >= 0 && day > 0) {
-								Calendar date = Calendar.getInstance();
-								date.set(year, month, day, 12, 0, 0);
-								logDate = date.getTimeInMillis();
-								logDate = (long) (Math.ceil(logDate / 1000)) * 1000;
-							} else {
-								logDate = 0;
-							}
-
-							if (logTypes.containsKey(matcherLog.group(1).toLowerCase()) == true) {
-								logDone.type = logTypes.get(matcherLog.group(1).toLowerCase());
+						}
+						
+						matcher = patternLogIcon.matcher(logs[k]);
+						if (matcher.find() && matcher.groupCount() > 0) {
+							if (logTypes.containsKey(matcher.group(1).toLowerCase()) == true) {
+								logDone.type = logTypes.get(matcher.group(1).toLowerCase());
 							} else {
 								logDone.type = logTypes.get("icon_note");
 							}
-
-							logDone.author = Html.fromHtml(matcherLog.group(6)).toString();
-							logDone.date = logDate;
-							if (matcherLog.group(8) != null) {
-								logDone.found = new Integer(matcherLog.group(8));
-							}
-							logDone.log = logTmp;
-
-							if (cache.logs == null) {
-								cache.logs = new ArrayList<CacheLog>();
-							}
-							cache.logs.add(logDone);
 						}
+						
+						matcher = patternLogDate.matcher(logs[k]);
+						if (matcher.find() && matcher.groupCount() > 0) {
+							Date logDate = dateLogIn.parse(matcher.group(1));
+							if (logDate != null) {
+								logDone.date = logDate.getTime();
+							}
+						}
+						
+						matcher = patternLogText.matcher(logs[k]);
+						if (matcher.find() && matcher.groupCount() > 0) {
+							logDone.log = matcher.group(1).trim();
+						}
+						
+						if (cache.logs == null) {
+							cache.logs = new ArrayList<CacheLog>();
+						}
+						cache.logs.add(logDone);
 					}
 				}
 			}
