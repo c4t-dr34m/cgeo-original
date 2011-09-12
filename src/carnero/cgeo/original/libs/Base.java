@@ -754,7 +754,7 @@ public class Base {
 			}
 
 			// found it
-			if (row.indexOf("/images/icons/icon_smile.gif") != -1) {
+			if (row.indexOf("/images/icons/icon_smile.png") != -1) {
 				cache.found = true;
 			} else {
 				cache.found = false;

@@ -150,9 +150,11 @@ public class mfMapView extends MapView implements MapViewImpl {
 				setMapViewMode(MapViewMode.OSMARENDER_TILE_DOWNLOAD);
 				break;
 			case mapsforgeOffline:
-				if (isValidMapFile(settings.getMapFile())) {
+				try {
 					setMapViewMode(MapViewMode.CANVAS_RENDERER);
 					super.setMapFile(settings.getMapFile());
+				} catch (Exception e) {
+					Log.e(Settings.tag, "mfMapView.setMapSource: " + e.toString());
 				}
 		}
 	}

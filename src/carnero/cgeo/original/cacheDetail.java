@@ -48,6 +48,9 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Parcelable;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.SubMenu;
@@ -63,6 +66,7 @@ import java.util.Locale;
 import java.util.Map.Entry;
 
 public class cacheDetail extends Activity {
+
 	public Long searchId = null;
 	public Cache cache = null;
 	public String geocode = null;
@@ -71,6 +75,7 @@ public class cacheDetail extends Activity {
 	private GoogleAnalyticsTracker tracker = null;
 	private Resources res = null;
 	private Activity activity = null;
+	private ViewPager pager = null;
 	private LayoutInflater inflater = null;
 	private App app = null;
 	private Settings settings = null;
@@ -95,6 +100,7 @@ public class cacheDetail extends Activity {
 	private ProgressDialog dropDialog = null;
 	private HashMap<Integer, String> calendars = new HashMap<Integer, String>();
 	private Handler storeCacheHandler = new Handler() {
+
 		@Override
 		public void handleMessage(Message msg) {
 			storeThread = null;
@@ -110,8 +116,8 @@ public class cacheDetail extends Activity {
 			setView();
 		}
 	};
-
 	private Handler refreshCacheHandler = new Handler() {
+
 		@Override
 		public void handleMessage(Message msg) {
 			refreshThread = null;
@@ -127,8 +133,8 @@ public class cacheDetail extends Activity {
 			setView();
 		}
 	};
-
 	private Handler dropCacheHandler = new Handler() {
+
 		@Override
 		public void handleMessage(Message msg) {
 			try {
@@ -142,8 +148,8 @@ public class cacheDetail extends Activity {
 			setView();
 		}
 	};
-
 	private Handler loadCacheHandler = new Handler() {
+
 		@Override
 		public void handleMessage(Message msg) {
 			if (searchId == null || searchId <= 0) {
@@ -165,26 +171,21 @@ public class cacheDetail extends Activity {
 			(new loadMapPreview(cache, loadMapPreviewHandler)).start();
 		}
 	};
-
 	final Handler loadMapPreviewHandler = new Handler() {
+
 		@Override
 		public void handleMessage(Message message) {
 			BitmapDrawable image = (BitmapDrawable) message.obj;
-			ScrollView scroll = (ScrollView) findViewById(R.id.details_list_box);
 			ImageView view = (ImageView) findViewById(R.id.map_preview);
 
 			if (image != null && view != null) {
 				view.setImageDrawable(image);
-
-				if (scroll.getScrollY() == 0) {
-					scroll.scrollTo(0, (int) (80 * pixelRatio));
-				}
 				view.setVisibility(View.VISIBLE);
 			}
 		}
 	};
-
 	private Handler loadDescriptionHandler = new Handler() {
+
 		@Override
 		public void handleMessage(Message msg) {
 			if (longDesc == null && cache != null && cache.description != null) {
@@ -198,8 +199,7 @@ public class cacheDetail extends Activity {
 					descView.setVisibility(View.VISIBLE);
 					descView.setText(longDesc, TextView.BufferType.SPANNABLE);
 					descView.setMovementMethod(LinkMovementMethod.getInstance());
-				}
-				else {
+				} else {
 					descView.setVisibility(View.GONE);
 				}
 
@@ -349,7 +349,9 @@ public class cacheDetail extends Activity {
 		if (geo != null) {
 			geo = app.removeGeo();
 		}
-		if (tracker != null) tracker.stop();
+		if (tracker != null) {
+			tracker.stop();
+		}
 
 		super.onDestroy();
 	}
@@ -379,7 +381,7 @@ public class cacheDetail extends Activity {
 
 		if (viewId == R.id.author || viewId == R.id.value) {
 			if (viewId == R.id.author) { // Author of a log entry
-				contextMenuUser = ((TextView)view).getText().toString();
+				contextMenuUser = ((TextView) view).getText().toString();
 			} else if (viewId == R.id.value) { // The owner of the cache
 				if (cache.ownerReal != null && cache.ownerReal.length() > 0) {
 					contextMenuUser = cache.ownerReal;
@@ -530,6 +532,9 @@ public class cacheDetail extends Activity {
 	}
 
 	private void init() {
+		pager = (ViewPager) findViewById(R.id.pager);
+		pager.setAdapter(new Adapter());
+
 		final DisplayMetrics dm = getResources().getDisplayMetrics();
 		pixelRatio = dm.density;
 
@@ -564,7 +569,9 @@ public class cacheDetail extends Activity {
 		cache = app.getCache(searchId);
 
 		if (cache == null) {
-			if (waitDialog != null && waitDialog.isShowing()) waitDialog.dismiss();
+			if (waitDialog != null && waitDialog.isShowing()) {
+				waitDialog.dismiss();
+			}
 
 			if (geocode != null && geocode.length() > 0) {
 				warning.showToast(res.getString(R.string.err_detail_cache_find) + " " + geocode + ".");
@@ -609,9 +616,6 @@ public class cacheDetail extends Activity {
 
 			inflater = activity.getLayoutInflater();
 			geocode = cache.geocode.toUpperCase();
-
-			ScrollView scroll = (ScrollView) findViewById(R.id.details_list_box);
-			scroll.setVisibility(View.VISIBLE);
 
 			LinearLayout detailsList = (LinearLayout) findViewById(R.id.details_list);
 			detailsList.removeAllViews();
@@ -807,17 +811,17 @@ public class cacheDetail extends Activity {
 					attribute = cache.attributes.get(i);
 
 					// dynamically search for a translation of the attribute
-				    int id = res.getIdentifier("attribute_" + attribute, "string", base.context.getPackageName());
-				    if (id > 0) {
-				    	String translated = res.getString(id);
-				    	if (translated != null && translated.length() > 0) {
-				    		attribute = translated;
-				    	}
-				    }
-				    if (buffer.length() > 0) {
-				    	buffer.append('\n');
-				    }
-				    buffer.append(attribute);
+					int id = res.getIdentifier("attribute_" + attribute, "string", base.context.getPackageName());
+					if (id > 0) {
+						String translated = res.getString(id);
+						if (translated != null && translated.length() > 0) {
+							attribute = translated;
+						}
+					}
+					if (buffer.length() > 0) {
+						buffer.append('\n');
+					}
+					buffer.append(attribute);
 				}
 
 				attribView.setText(buffer);
@@ -835,10 +839,9 @@ public class cacheDetail extends Activity {
 						inventoryString.append("\n");
 					}
 					// avoid HTML parsing where possible
-					if (inventoryItem.name.indexOf('<') >= 0 || inventoryItem.name.indexOf('&') >= 0 ) {
+					if (inventoryItem.name.indexOf('<') >= 0 || inventoryItem.name.indexOf('&') >= 0) {
 						inventoryString.append(Html.fromHtml(inventoryItem.name).toString());
-					}
-					else {
+					} else {
 						inventoryString.append(inventoryItem.name);
 					}
 				}
@@ -925,6 +928,7 @@ public class cacheDetail extends Activity {
 				Button showDesc = (Button) findViewById(R.id.show_description);
 				showDesc.setVisibility(View.VISIBLE);
 				showDesc.setOnClickListener(new View.OnClickListener() {
+
 					public void onClick(View arg0) {
 						loadLongDesc();
 					}
@@ -955,21 +959,25 @@ public class cacheDetail extends Activity {
 						// check only the first character. sometimes there are inconsistencies like FI or FN for the FINAL
 						char firstLetter = Character.toUpperCase(waypoint.prefix.charAt(0));
 						switch (firstLetter) {
-						case 'P' : return -100; // parking
-						case 'S' : { // stage N
-							try {
-								Integer stageNumber = Integer.valueOf(waypoint.prefix.substring(1));
-								return stageNumber;
-							} catch (NumberFormatException e) {
-								// nothing
+							case 'P':
+								return -100; // parking
+							case 'S': { // stage N
+								try {
+									Integer stageNumber = Integer.valueOf(waypoint.prefix.substring(1));
+									return stageNumber;
+								} catch (NumberFormatException e) {
+									// nothing
+								}
+								return 0;
 							}
-							return 0;
-						}
-						case 'F' : return 1000; // final
-						case 'O' : return 10000; // own
+							case 'F':
+								return 1000; // final
+							case 'O':
+								return 10000; // own
 						}
 						return 0;
-					}});
+					}
+				});
 
 				for (Waypoint wpt : sortedWaypoints) {
 					waypointView = (LinearLayout) inflater.inflate(R.layout.waypoint_item, null);
@@ -988,16 +996,14 @@ public class cacheDetail extends Activity {
 						// avoid HTML parsing
 						if (wpt.name.indexOf('<') >= 0 || wpt.name.indexOf('&') >= 0) {
 							((TextView) waypointView.findViewById(R.id.name)).setText(Html.fromHtml(wpt.name.trim()), TextView.BufferType.SPANNABLE);
-						}
-						else {
+						} else {
 							((TextView) waypointView.findViewById(R.id.name)).setText(wpt.name.trim());
 						}
 					}
 					// avoid HTML parsing
 					if (wpt.note.indexOf('<') >= 0 || wpt.note.indexOf('&') >= 0) {
 						((TextView) waypointView.findViewById(R.id.note)).setText(Html.fromHtml(wpt.note.trim()), TextView.BufferType.SPANNABLE);
-					}
-					else {
+					} else {
 						((TextView) waypointView.findViewById(R.id.note)).setText(wpt.note.trim());
 					}
 
@@ -1032,15 +1038,29 @@ public class cacheDetail extends Activity {
 		} catch (Exception e) {
 			Log.e(Settings.tag, "cgeodetail.setView: " + e.toString());
 		}
+		
+		if (pager != null && pager.getVisibility() == View.GONE) {
+			pager.setVisibility(View.VISIBLE);
+		}
 
-		if (waitDialog != null && waitDialog.isShowing()) waitDialog.dismiss();
-		if (storeDialog != null && storeDialog.isShowing()) storeDialog.dismiss();
-		if (dropDialog != null && dropDialog.isShowing()) dropDialog.dismiss();
-		if (refreshDialog != null && refreshDialog.isShowing()) refreshDialog.dismiss();
+		if (waitDialog != null && waitDialog.isShowing()) {
+			waitDialog.dismiss();
+		}
+		if (storeDialog != null && storeDialog.isShowing()) {
+			storeDialog.dismiss();
+		}
+		if (dropDialog != null && dropDialog.isShowing()) {
+			dropDialog.dismiss();
+		}
+		if (refreshDialog != null && refreshDialog.isShowing()) {
+			refreshDialog.dismiss();
+		}
 
 		displayLogs();
 
-		if (geo != null) geoUpdate.updateLoc(geo);
+		if (geo != null) {
+			geoUpdate.updateLoc(geo);
+		}
 	}
 
 	private RelativeLayout addStarRating(final LinearLayout detailsList, final String name, final float value) {
@@ -1076,7 +1096,7 @@ public class cacheDetail extends Activity {
 			buff.append(": ");
 
 			// sort the log counts by type id ascending. that way the FOUND, DNF log types are the first and most visible ones
-			ArrayList<Entry<Integer, Integer>> sortedLogCounts = new ArrayList<Entry<Integer,Integer>>();
+			ArrayList<Entry<Integer, Integer>> sortedLogCounts = new ArrayList<Entry<Integer, Integer>>();
 			sortedLogCounts.addAll(cache.logCounts.entrySet());
 			Collections.sort(sortedLogCounts, new Comparator<Entry<Integer, Integer>>() {
 
@@ -1084,7 +1104,8 @@ public class cacheDetail extends Activity {
 				public int compare(Entry<Integer, Integer> logCountItem1,
 						Entry<Integer, Integer> logCountItem2) {
 					return logCountItem1.getKey().compareTo(logCountItem2.getKey());
-				}});
+				}
+			});
 			for (Entry<Integer, Integer> pair : sortedLogCounts) {
 				int logTypeId = pair.getKey().intValue();
 				String logTypeLabel = Base.logTypes1.get(logTypeId);
@@ -1097,7 +1118,7 @@ public class cacheDetail extends Activity {
 					buff.append("× ");
 					buff.append(logTypeLabel);
 				}
-				logCounter ++;
+				logCounter++;
 			}
 			textView.setText(buff.toString());
 		}
@@ -1132,8 +1153,7 @@ public class cacheDetail extends Activity {
 				// avoid parsing HTML if not necessary
 				if (log.author.indexOf('<') >= 0 || log.author.indexOf('&') >= 0) {
 					((TextView) rowView.findViewById(R.id.author)).setText(Html.fromHtml(log.author), TextView.BufferType.SPANNABLE);
-				}
-				else {
+				} else {
 					((TextView) rowView.findViewById(R.id.author)).setText(log.author);
 				}
 
@@ -1149,8 +1169,7 @@ public class cacheDetail extends Activity {
 				// avoid parsing HTML if not necessary
 				if (log.log.indexOf('<') >= 0 || log.log.indexOf('&') >= 0) {
 					((TextView) rowView.findViewById(R.id.log)).setText(Html.fromHtml(log.log, new HtmlImg(activity, settings, null, false, cache.reason, false), null), TextView.BufferType.SPANNABLE);
-				}
-				else {
+				} else {
 					((TextView) rowView.findViewById(R.id.log)).setText(log.log);
 				}
 
@@ -1224,6 +1243,7 @@ public class cacheDetail extends Activity {
 	}
 
 	private class loadMapPreview extends Thread {
+
 		private Cache cache = null;
 		private Handler handler = null;
 
@@ -1270,6 +1290,7 @@ public class cacheDetail extends Activity {
 	}
 
 	private class loadLongDesc extends Thread {
+
 		private Handler handler = null;
 
 		public loadLongDesc(Handler handlerIn) {
@@ -1351,7 +1372,7 @@ public class cacheDetail extends Activity {
 	}
 
 	private void addToCalendar() {
-		String[] projection = new String[] { "_id", "displayName" };
+		String[] projection = new String[]{"_id", "displayName"};
 		Uri calendarProvider = null;
 		final int sdk = new Integer(Build.VERSION.SDK).intValue();
 		if (sdk >= 8) {
@@ -1395,6 +1416,7 @@ public class cacheDetail extends Activity {
 		AlertDialog.Builder builder = new AlertDialog.Builder(activity);
 		builder.setTitle(R.string.cache_calendars);
 		builder.setItems(items, new DialogInterface.OnClickListener() {
+
 			public void onClick(DialogInterface dialog, int item) {
 				addToCalendarFn(item);
 			}
@@ -1542,7 +1564,7 @@ public class cacheDetail extends Activity {
 
 		if (cache != null && cache.geocode != null) {
 			String subject = cache.geocode.toUpperCase();
-			if (cache.name != null && cache.name.length() > 0){
+			if (cache.name != null && cache.name.length() > 0) {
 				subject = subject + " - " + cache.name;
 			}
 			intent.putExtra(Intent.EXTRA_SUBJECT, "Geocache " + subject);
@@ -1556,6 +1578,7 @@ public class cacheDetail extends Activity {
 	}
 
 	private class waypointInfo implements View.OnClickListener {
+
 		private int id = -1;
 
 		public waypointInfo(int idIn) {
@@ -1600,6 +1623,7 @@ public class cacheDetail extends Activity {
 	}
 
 	public class codeHint implements View.OnClickListener {
+
 		public void onClick(View arg0) {
 			// code hint
 			TextView hintView = ((TextView) findViewById(R.id.hint));
@@ -1609,6 +1633,7 @@ public class cacheDetail extends Activity {
 	}
 
 	private class update extends UpdateLoc {
+
 		@Override
 		public void updateLoc(Geo geo) {
 			if (geo == null) {
@@ -1658,6 +1683,7 @@ public class cacheDetail extends Activity {
 	}
 
 	private class selectTrackable implements View.OnClickListener {
+
 		public void onClick(View arg0) {
 			// show list of trackableList
 			try {
@@ -1671,6 +1697,7 @@ public class cacheDetail extends Activity {
 	}
 
 	private class storeCache implements View.OnClickListener {
+
 		public void onClick(View arg0) {
 			if (dropDialog != null && dropDialog.isShowing() == true) {
 				warning.showToast(res.getString(R.string.err_detail_still_removing));
@@ -1694,6 +1721,7 @@ public class cacheDetail extends Activity {
 	}
 
 	private class refreshCache implements View.OnClickListener {
+
 		public void onClick(View arg0) {
 			if (dropDialog != null && dropDialog.isShowing() == true) {
 				warning.showToast(res.getString(R.string.err_detail_still_removing));
@@ -1717,6 +1745,7 @@ public class cacheDetail extends Activity {
 	}
 
 	private class storeCacheThread extends Thread {
+
 		private Handler handler = null;
 
 		public storeCacheThread(Handler handlerIn) {
@@ -1734,6 +1763,7 @@ public class cacheDetail extends Activity {
 	}
 
 	private class refreshCacheThread extends Thread {
+
 		private Handler handler = null;
 
 		public refreshCacheThread(Handler handlerIn) {
@@ -1753,6 +1783,7 @@ public class cacheDetail extends Activity {
 	}
 
 	private class dropCache implements View.OnClickListener {
+
 		public void onClick(View arg0) {
 			if (storeDialog != null && storeDialog.isShowing() == true) {
 				warning.showToast(res.getString(R.string.err_detail_still_saving));
@@ -1808,7 +1839,7 @@ public class cacheDetail extends Activity {
 			}
 
 			try {
-				final TextView logView = (TextView)view;
+				final TextView logView = (TextView) view;
 				Spannable span = (Spannable) logView.getText();
 
 				// I needed to re-implement the base.rot13() encryption here because we must work on
@@ -1855,7 +1886,6 @@ public class cacheDetail extends Activity {
 		}
 	}
 
-
 	public void goHome(View view) {
 		base.goHome(activity);
 	}
@@ -1878,5 +1908,54 @@ public class cacheDetail extends Activity {
 		}
 		navigate.coordinates = getCoordinates();
 		activity.startActivity(navigateIntent);
+	}
+
+	private class Adapter extends PagerAdapter {
+
+		@Override
+		public Object instantiateItem(View collection, int position) {
+			final ScrollView view = (ScrollView) pager.getChildAt(position);
+
+			return view;
+		}
+
+		@Override
+		public int getCount() {
+			return pager.getChildCount();
+		}
+
+		@Override
+		public void destroyItem(View pager, int position, Object view) {
+			// no not destroy views
+		}
+
+		@Override
+		public boolean isViewFromObject(View view, Object object) {
+			if (object instanceof ScrollView && view == (ScrollView) object) {
+				return true;
+			}
+
+			return false;
+		}
+
+		@Override
+		public void finishUpdate(View arg0) {
+			// nothing
+		}
+
+		@Override
+		public void restoreState(Parcelable arg0, ClassLoader arg1) {
+			// nothing
+		}
+
+		@Override
+		public Parcelable saveState() {
+			return null;
+		}
+
+		@Override
+		public void startUpdate(View arg0) {
+			// nothing
+		}
 	}
 }
