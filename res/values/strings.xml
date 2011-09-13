@@ -246,6 +246,7 @@
 	<string name="caches_sort">Sort</string> <!-- since: 2.10 RC2 -->
 	<string name="caches_sort_title">Sort by</string> <!-- since: 2.10 RC3 -->
 	<string name="caches_sort_distance">distance</string> <!-- since: 2.10 RC3 -->
+	<string name="caches_sort_found">status</string> <!-- since: 2011.09.13 -->
 	<string name="caches_sort_difficulty">difficulty</string> <!-- since: 2.10 RC3 -->
 	<string name="caches_sort_terrain">terrain</string> <!-- since: 2.10 RC3 -->
 	<string name="caches_sort_size">size</string> <!-- since: 2.10 RC3 -->
@@ -402,6 +403,14 @@
 	<string name="auth_dialog_pin_message">Please type in PIN code provided by Twitter website. It\'s mandatory to complete authorization.</string>
 	<string name="auth_dialog_completed">c:geo is now authorized to post on Twitter.</string>
 
+	<!-- tabs -->
+	<string name="tab_details">Summary</string>
+	<string name="tab_descriptions">Description</string>
+	<string name="tab_waypoints">Waypoints</string>
+	<string name="tab_logs">Logbook</string>
+	<string name="tab_inventory">Inventory</string>
+	<string name="tab_attributes">Attributes</string>
+	
 	<!-- cache -->
 	<string name="cache_count_no">No cache</string>
 	<string name="cache_count_one">One cache</string>

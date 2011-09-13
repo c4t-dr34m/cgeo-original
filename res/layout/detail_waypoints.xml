@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent"
+		android:padding="4dip"
+		android:orientation="vertical" >
+
+	<!-- waypoints -->
+	<LinearLayout android:id="@+id/waypoints_box"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:orientation="vertical"  >
+		<LinearLayout
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:orientation="vertical" >
+			<LinearLayout android:id="@+id/waypoints"
+					android:layout_width="fill_parent"
+					android:layout_height="wrap_content"
+					android:orientation="vertical" >
+			</LinearLayout>
+			<Button style="@style/button_small"
+					android:id="@+id/add_waypoint"
+					android:text="@string/cache_waypoints_add" />
+		</LinearLayout>
+	</LinearLayout>
+</ScrollView>

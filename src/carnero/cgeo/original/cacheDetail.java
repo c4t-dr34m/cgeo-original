@@ -23,7 +23,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
-import android.content.Context;
 import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
@@ -44,17 +43,13 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.Cursor;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Parcelable;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.util.DisplayMetrics;
-import android.view.Display;
 import android.view.SubMenu;
-import android.view.WindowManager;
 import android.widget.Button;
 
 import com.google.android.apps.analytics.GoogleAnalyticsTracker;
@@ -67,6 +62,12 @@ import java.util.Map.Entry;
 
 public class cacheDetail extends Activity {
 
+	private static final int TAB_DTS = 1;
+	private static final int TAB_DSC = 2;
+	private static final int TAB_WPT = 3;
+	private static final int TAB_LOG = 4;
+	private static final int TAB_INV = 5;
+	private static final int TAB_ATR = 6;
 	public Long searchId = null;
 	public Cache cache = null;
 	public String geocode = null;
@@ -76,6 +77,16 @@ public class cacheDetail extends Activity {
 	private Resources res = null;
 	private Activity activity = null;
 	private ViewPager pager = null;
+	private TextView indicatorCurrent;
+	private TextView indicatorPrev;
+	private TextView indicatorNext;
+	private ArrayList<Integer> tabOrder;
+	private ScrollView viewDetails;
+	private ScrollView viewDescriptions;
+	private ScrollView viewWaypoints;
+	private ScrollView viewLogs;
+	private ScrollView viewInventory;
+	private ScrollView viewAttributes;
 	private LayoutInflater inflater = null;
 	private App app = null;
 	private Settings settings = null;
@@ -83,7 +94,6 @@ public class cacheDetail extends Activity {
 	private Warning warning = null;
 	private Geo geo = null;
 	private UpdateLoc geoUpdate = new update();
-	private float pixelRatio = 1;
 	private TextView cacheDistance = null;
 	private String contextMenuUser = null;
 	private ProgressDialog waitDialog = null;
@@ -113,7 +123,7 @@ public class cacheDetail extends Activity {
 				Log.e(Settings.tag, "cgeodetail.storeCacheHandler: " + e.toString());
 			}
 
-			setView();
+			load();
 		}
 	};
 	private Handler refreshCacheHandler = new Handler() {
@@ -130,7 +140,7 @@ public class cacheDetail extends Activity {
 				Log.e(Settings.tag, "cgeodetail.refreshCacheHandler: " + e.toString());
 			}
 
-			setView();
+			load();
 		}
 	};
 	private Handler dropCacheHandler = new Handler() {
@@ -145,7 +155,7 @@ public class cacheDetail extends Activity {
 				Log.e(Settings.tag, "cgeodetail.dropCacheHandler: " + e.toString());
 			}
 
-			setView();
+			load();
 		}
 	};
 	private Handler loadCacheHandler = new Handler() {
@@ -166,58 +176,10 @@ public class cacheDetail extends Activity {
 				return;
 			}
 
-			setView();
-
-			(new loadMapPreview(cache, loadMapPreviewHandler)).start();
+			load();
 		}
 	};
-	final Handler loadMapPreviewHandler = new Handler() {
-
-		@Override
-		public void handleMessage(Message message) {
-			BitmapDrawable image = (BitmapDrawable) message.obj;
-			ImageView view = (ImageView) findViewById(R.id.map_preview);
-
-			if (image != null && view != null) {
-				view.setImageDrawable(image);
-				view.setVisibility(View.VISIBLE);
-			}
-		}
-	};
-	private Handler loadDescriptionHandler = new Handler() {
-
-		@Override
-		public void handleMessage(Message msg) {
-			if (longDesc == null && cache != null && cache.description != null) {
-				longDesc = Html.fromHtml(cache.description.trim(), new HtmlImg(activity, settings, geocode, true, cache.reason, false), null);
-			}
-
-			if (longDesc != null) {
-				((LinearLayout) findViewById(R.id.desc_box)).setVisibility(View.VISIBLE);
-				TextView descView = (TextView) findViewById(R.id.description);
-				if (cache.description.length() > 0) {
-					descView.setVisibility(View.VISIBLE);
-					descView.setText(longDesc, TextView.BufferType.SPANNABLE);
-					descView.setMovementMethod(LinkMovementMethod.getInstance());
-				} else {
-					descView.setVisibility(View.GONE);
-				}
-
-				Button showDesc = (Button) findViewById(R.id.show_description);
-				showDesc.setVisibility(View.GONE);
-				showDesc.setOnTouchListener(null);
-				showDesc.setOnClickListener(null);
-			} else {
-				warning.showToast(res.getString(R.string.err_load_descr_failed));
-			}
-
-			if (descDialog != null && descDialog.isShowing()) {
-				descDialog.dismiss();
-			}
-
-			longDescDisplayed = true;
-		}
-	};
+	private final LoadDescriptionHandler loadDescriptionHandler = new LoadDescriptionHandler();
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -329,7 +291,7 @@ public class cacheDetail extends Activity {
 	public void onConfigurationChanged(Configuration newConfig) {
 		super.onConfigurationChanged(newConfig);
 
-		setView();
+		load();
 	}
 
 	@Override
@@ -341,7 +303,7 @@ public class cacheDetail extends Activity {
 		if (geo == null) {
 			geo = app.startGeo(activity, geoUpdate, base, settings, warning, 0, 0);
 		}
-		setView();
+		load();
 	}
 
 	@Override
@@ -532,12 +494,6 @@ public class cacheDetail extends Activity {
 	}
 
 	private void init() {
-		pager = (ViewPager) findViewById(R.id.pager);
-		pager.setAdapter(new Adapter());
-
-		final DisplayMetrics dm = getResources().getDisplayMetrics();
-		pixelRatio = dm.density;
-
 		if (inflater == null) {
 			inflater = activity.getLayoutInflater();
 		}
@@ -557,11 +513,170 @@ public class cacheDetail extends Activity {
 		}
 	}
 
-	private void setView() {
-		RelativeLayout itemLayout;
-		TextView itemName;
-		TextView itemValue;
+	private class Adapter extends PagerAdapter {
 
+		@Override
+		public Object instantiateItem(View collection, int position) {
+			if (tabOrder == null) {
+				fillTabOrder();
+			}
+			final int tab = tabOrder.get(position);
+
+			ScrollView view;
+
+			switch (tab) {
+				case TAB_DTS:
+					view = viewDetails();
+					break;
+				case TAB_DSC:
+					view = viewDescriptions();
+					break;
+				case TAB_WPT:
+					view = viewWaypoints();
+					break;
+				case TAB_LOG:
+					view = viewLogs();
+					break;
+				case TAB_INV:
+					view = viewInventory();
+					break;
+				case TAB_ATR:
+					view = viewAttributes();
+					break;
+				default:
+					view = null;
+			}
+
+			((ViewPager) collection).addView(view);
+
+			return view;
+		}
+
+		@Override
+		public int getCount() {
+			if (tabOrder == null) {
+				fillTabOrder();
+			}
+
+			return tabOrder.size();
+		}
+
+		@Override
+		public void destroyItem(View collection, int position, Object view) {
+			((ViewPager) collection).removeView((View) view);
+		}
+
+		@Override
+		public boolean isViewFromObject(View view, Object object) {
+			if (view == object) {
+				return true;
+			}
+
+			return false;
+		}
+
+		@Override
+		public void finishUpdate(View arg0) {
+			// nothing
+		}
+
+		@Override
+		public void restoreState(Parcelable arg0, ClassLoader arg1) {
+			// nothing
+		}
+
+		@Override
+		public Parcelable saveState() {
+			return null;
+		}
+
+		@Override
+		public void startUpdate(View arg0) {
+			// nothing
+		}
+	}
+
+	private class Indicator implements ViewPager.OnPageChangeListener {
+
+		@Override
+		public void onPageScrollStateChanged(int state) {
+			// nothing
+		}
+
+		@Override
+		public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+			// nothing
+		}
+
+		@Override
+		public void onPageSelected(int position) {
+			if (tabOrder == null) {
+				fillTabOrder();
+			}
+			
+			if (indicatorPrev == null) {
+				indicatorPrev = (TextView) findViewById(R.id.indicator_prev);
+			}
+			if (indicatorCurrent == null) {
+				indicatorCurrent = (TextView) findViewById(R.id.indicator_current);
+			}
+			if (indicatorNext == null) {
+				indicatorNext = (TextView) findViewById(R.id.indicator_next);
+			}
+			
+			final int tabCurrent = tabOrder.get(position);
+			indicatorCurrent.setText(getTabTitle(tabCurrent));
+			
+			if (position > 0) {
+				final int tabPrev = tabOrder.get(position - 1);
+				
+				indicatorPrev.setText("« " + getTabTitle(tabPrev).toLowerCase(Locale.getDefault()));
+				indicatorPrev.setVisibility(View.VISIBLE);
+			} else {
+				indicatorPrev.setVisibility(View.GONE);
+			}
+			
+			if (position < (tabOrder.size() - 1)) {
+				final int tabNext = tabOrder.get(position + 1);
+				
+				indicatorNext.setText(getTabTitle(tabNext).toLowerCase(Locale.getDefault()) + " »");
+				indicatorNext.setVisibility(View.VISIBLE);
+			} else {
+				indicatorNext.setVisibility(View.GONE);
+			}
+		}
+	}
+	
+	private String getTabTitle(int tab) {
+		String title;
+
+		switch (tab) {
+			case TAB_DTS:
+				title = getString(R.string.tab_details);
+				break;
+			case TAB_DSC:
+				title = getString(R.string.tab_descriptions);
+				break;
+			case TAB_WPT:
+				title = getString(R.string.tab_waypoints);
+				break;
+			case TAB_LOG:
+				title = getString(R.string.tab_logs);
+				break;
+			case TAB_INV:
+				title = getString(R.string.tab_inventory);
+				break;
+			case TAB_ATR:
+				title = getString(R.string.tab_attributes);
+				break;
+			default:
+				title = "";
+		}
+
+		return title;
+	}
+
+	private void load() {
 		if (searchId == null) {
 			return;
 		}
@@ -583,6 +698,15 @@ public class cacheDetail extends Activity {
 			finish();
 			return;
 		}
+
+		final ViewPager.OnPageChangeListener pagerListener = new Indicator();
+		pagerListener.onPageSelected(0);
+		
+		pager = (ViewPager) findViewById(R.id.pager);
+		pager.setOnPageChangeListener(pagerListener);
+		pager.setAdapter(new Adapter());
+		
+		fillTabOrder();
 
 		if (cache.reason >= 1) {
 			base.sendAnal(activity, tracker, "/cache/detail/stored");
@@ -617,418 +741,11 @@ public class cacheDetail extends Activity {
 			inflater = activity.getLayoutInflater();
 			geocode = cache.geocode.toUpperCase();
 
-			LinearLayout detailsList = (LinearLayout) findViewById(R.id.details_list);
-			detailsList.removeAllViews();
-
 			// actionbar icon
 			if (cache.type != null && gcIcons.containsKey(cache.type) == true) { // cache icon
 				((TextView) findViewById(R.id.actionbar_title)).setCompoundDrawablesWithIntrinsicBounds((Drawable) activity.getResources().getDrawable(gcIcons.get(cache.type)), null, null, null);
 			} else { // unknown cache type, "mystery" icon
 				((TextView) findViewById(R.id.actionbar_title)).setCompoundDrawablesWithIntrinsicBounds((Drawable) activity.getResources().getDrawable(gcIcons.get("mystery")), null, null, null);
-			}
-
-			// cache name (full name)
-			itemLayout = (RelativeLayout) inflater.inflate(R.layout.cache_item, null);
-			itemName = (TextView) itemLayout.findViewById(R.id.name);
-			itemValue = (TextView) itemLayout.findViewById(R.id.value);
-
-			itemName.setText(res.getString(R.string.cache_name));
-			itemValue.setText(Html.fromHtml(cache.name).toString());
-			detailsList.addView(itemLayout);
-
-			// cache type
-			itemLayout = (RelativeLayout) inflater.inflate(R.layout.cache_item, null);
-			itemName = (TextView) itemLayout.findViewById(R.id.name);
-			itemValue = (TextView) itemLayout.findViewById(R.id.value);
-
-			itemName.setText(res.getString(R.string.cache_type));
-
-			String size = null;
-			if (cache.size != null && cache.size.length() > 0) {
-				size = " (" + cache.size + ")";
-			} else {
-				size = "";
-			}
-
-			if (Base.cacheTypesInv.containsKey(cache.type) == true) { // cache icon
-				itemValue.setText(Base.cacheTypesInv.get(cache.type) + size);
-			} else {
-				itemValue.setText(Base.cacheTypesInv.get("mystery") + size);
-			}
-			detailsList.addView(itemLayout);
-
-			// gc-code
-			itemLayout = (RelativeLayout) inflater.inflate(R.layout.cache_item, null);
-			itemName = (TextView) itemLayout.findViewById(R.id.name);
-			itemValue = (TextView) itemLayout.findViewById(R.id.value);
-
-			itemName.setText(res.getString(R.string.cache_geocode));
-			itemValue.setText(cache.geocode.toUpperCase());
-			detailsList.addView(itemLayout);
-
-			// cache state
-			if (cache.logOffline == true || cache.archived == true || cache.disabled == true || cache.members == true || cache.found == true) {
-				itemLayout = (RelativeLayout) inflater.inflate(R.layout.cache_item, null);
-				itemName = (TextView) itemLayout.findViewById(R.id.name);
-				itemValue = (TextView) itemLayout.findViewById(R.id.value);
-
-				itemName.setText(res.getString(R.string.cache_status));
-
-				StringBuilder state = new StringBuilder();
-				if (cache.logOffline == true) {
-					if (state.length() > 0) {
-						state.append(", ");
-					}
-					state.append(res.getString(R.string.cache_status_offline_log));
-				}
-				if (cache.found == true) {
-					if (state.length() > 0) {
-						state.append(", ");
-					}
-					state.append(res.getString(R.string.cache_status_found));
-				}
-				if (cache.archived == true) {
-					if (state.length() > 0) {
-						state.append(", ");
-					}
-					state.append(res.getString(R.string.cache_status_archived));
-				}
-				if (cache.disabled == true) {
-					if (state.length() > 0) {
-						state.append(", ");
-					}
-					state.append(res.getString(R.string.cache_status_disabled));
-				}
-				if (cache.members == true) {
-					if (state.length() > 0) {
-						state.append(", ");
-					}
-					state.append(res.getString(R.string.cache_status_premium));
-				}
-
-				itemValue.setText(state.toString());
-				detailsList.addView(itemLayout);
-
-				state = null;
-			}
-
-			// distance
-			itemLayout = (RelativeLayout) inflater.inflate(R.layout.cache_item, null);
-			itemName = (TextView) itemLayout.findViewById(R.id.name);
-			itemValue = (TextView) itemLayout.findViewById(R.id.value);
-
-			itemName.setText(res.getString(R.string.cache_distance));
-			if (cache.distance != null) {
-				itemValue.setText("~" + base.getHumanDistance(cache.distance));
-			} else {
-				itemValue.setText("--");
-			}
-			detailsList.addView(itemLayout);
-			cacheDistance = itemValue;
-
-			// difficulty
-			if (cache.difficulty != null && cache.difficulty > 0) {
-				addStarRating(detailsList, res.getString(R.string.cache_difficulty), cache.difficulty);
-			}
-
-			// terrain
-			if (cache.terrain != null && cache.terrain > 0) {
-				addStarRating(detailsList, res.getString(R.string.cache_terrain), cache.terrain);
-			}
-
-			// favourite count
-			if (cache.favouriteCnt != null) {
-				itemLayout = (RelativeLayout) inflater.inflate(R.layout.cache_item, null);
-				itemName = (TextView) itemLayout.findViewById(R.id.name);
-				itemValue = (TextView) itemLayout.findViewById(R.id.value);
-
-				itemName.setText(res.getString(R.string.cache_favourite));
-				itemValue.setText(String.format("%d", cache.favouriteCnt) + "×");
-				detailsList.addView(itemLayout);
-			}
-
-			// cache author
-			if ((cache.owner != null && cache.owner.length() > 0) || (cache.ownerReal != null && cache.ownerReal.length() > 0)) {
-				itemLayout = (RelativeLayout) inflater.inflate(R.layout.cache_item, null);
-				itemName = (TextView) itemLayout.findViewById(R.id.name);
-				itemValue = (TextView) itemLayout.findViewById(R.id.value);
-
-				itemName.setText(res.getString(R.string.cache_owner));
-				if (cache.owner != null && cache.owner.length() > 0) {
-					itemValue.setText(Html.fromHtml(cache.owner), TextView.BufferType.SPANNABLE);
-				} else if (cache.ownerReal != null && cache.ownerReal.length() > 0) {
-					itemValue.setText(Html.fromHtml(cache.ownerReal), TextView.BufferType.SPANNABLE);
-				}
-				itemValue.setOnClickListener(new userActions());
-				detailsList.addView(itemLayout);
-			}
-
-			// cache hidden
-			if (cache.hidden != null && cache.hidden.getTime() > 0) {
-				itemLayout = (RelativeLayout) inflater.inflate(R.layout.cache_item, null);
-				itemName = (TextView) itemLayout.findViewById(R.id.name);
-				itemValue = (TextView) itemLayout.findViewById(R.id.value);
-
-				if (cache.type != null && (cache.type.equalsIgnoreCase("event") == true || cache.type.equalsIgnoreCase("mega") == true || cache.type.equalsIgnoreCase("cito") == true)) {
-					itemName.setText(res.getString(R.string.cache_event));
-				} else {
-					itemName.setText(res.getString(R.string.cache_hidden));
-				}
-				itemValue.setText(Base.dateOut.format(cache.hidden));
-				detailsList.addView(itemLayout);
-			}
-
-			// cache location
-			if (cache.location != null && cache.location.length() > 0) {
-				itemLayout = (RelativeLayout) inflater.inflate(R.layout.cache_item, null);
-				itemName = (TextView) itemLayout.findViewById(R.id.name);
-				itemValue = (TextView) itemLayout.findViewById(R.id.value);
-
-				itemName.setText(res.getString(R.string.cache_location));
-				itemValue.setText(cache.location);
-				detailsList.addView(itemLayout);
-			}
-
-			// cache coordinates
-			if (cache.latitude != null && cache.longitude != null) {
-				itemLayout = (RelativeLayout) inflater.inflate(R.layout.cache_item, null);
-				itemName = (TextView) itemLayout.findViewById(R.id.name);
-				itemValue = (TextView) itemLayout.findViewById(R.id.value);
-
-				itemName.setText(res.getString(R.string.cache_coordinates));
-				itemValue.setText(cache.latitudeString + " | " + cache.longitudeString);
-				detailsList.addView(itemLayout);
-			}
-
-			// cache attributes
-			if (cache.attributes != null && cache.attributes.size() > 0) {
-				final LinearLayout attribBox = (LinearLayout) findViewById(R.id.attributes_box);
-				final TextView attribView = (TextView) findViewById(R.id.attributes);
-
-				StringBuilder buffer = new StringBuilder();
-				String attribute;
-				for (int i = 0; i < cache.attributes.size(); i++) {
-					attribute = cache.attributes.get(i);
-
-					// dynamically search for a translation of the attribute
-					int id = res.getIdentifier("attribute_" + attribute, "string", base.context.getPackageName());
-					if (id > 0) {
-						String translated = res.getString(id);
-						if (translated != null && translated.length() > 0) {
-							attribute = translated;
-						}
-					}
-					if (buffer.length() > 0) {
-						buffer.append('\n');
-					}
-					buffer.append(attribute);
-				}
-
-				attribView.setText(buffer);
-				attribBox.setVisibility(View.VISIBLE);
-			}
-
-			// cache inventory
-			if (cache.inventory != null && cache.inventory.size() > 0) {
-				final LinearLayout inventBox = (LinearLayout) findViewById(R.id.inventory_box);
-				final TextView inventView = (TextView) findViewById(R.id.inventory);
-
-				StringBuilder inventoryString = new StringBuilder();
-				for (Trackable inventoryItem : cache.inventory) {
-					if (inventoryString.length() > 0) {
-						inventoryString.append("\n");
-					}
-					// avoid HTML parsing where possible
-					if (inventoryItem.name.indexOf('<') >= 0 || inventoryItem.name.indexOf('&') >= 0) {
-						inventoryString.append(Html.fromHtml(inventoryItem.name).toString());
-					} else {
-						inventoryString.append(inventoryItem.name);
-					}
-				}
-				inventView.setText(inventoryString);
-				inventBox.setClickable(true);
-				inventBox.setOnClickListener(new selectTrackable());
-				inventBox.setVisibility(View.VISIBLE);
-			}
-
-			// offline use
-			final TextView offlineText = (TextView) findViewById(R.id.offline_text);
-			final Button offlineRefresh = (Button) findViewById(R.id.offline_refresh);
-			final Button offlineStore = (Button) findViewById(R.id.offline_store);
-
-			if (cache.reason >= 1) {
-				Long diff = (System.currentTimeMillis() / (60 * 1000)) - (cache.detailedUpdate / (60 * 1000)); // minutes
-
-				String ago = "";
-				if (diff < 15) {
-					ago = res.getString(R.string.cache_offline_time_mins_few);
-				} else if (diff < 50) {
-					ago = res.getString(R.string.cache_offline_time_about) + " " + diff + " " + res.getString(R.string.cache_offline_time_mins);
-				} else if (diff < 90) {
-					ago = res.getString(R.string.cache_offline_time_about) + " " + res.getString(R.string.cache_offline_time_hour);
-				} else if (diff < (48 * 60)) {
-					ago = res.getString(R.string.cache_offline_time_about) + " " + (diff / 60) + " " + res.getString(R.string.cache_offline_time_hours);
-				} else {
-					ago = res.getString(R.string.cache_offline_time_about) + " " + (diff / (24 * 60)) + " " + res.getString(R.string.cache_offline_time_days);
-				}
-
-				offlineText.setText(res.getString(R.string.cache_offline_stored) + "\n" + ago);
-
-				offlineRefresh.setVisibility(View.VISIBLE);
-				offlineRefresh.setClickable(true);
-				offlineRefresh.setOnClickListener(new storeCache());
-
-				offlineStore.setText(res.getString(R.string.cache_offline_drop));
-				offlineStore.setClickable(true);
-				offlineStore.setOnClickListener(new dropCache());
-			} else {
-				offlineText.setText(res.getString(R.string.cache_offline_not_ready));
-
-				offlineRefresh.setVisibility(View.VISIBLE);
-				offlineRefresh.setClickable(true);
-				offlineRefresh.setOnClickListener(new refreshCache());
-
-				offlineStore.setText(res.getString(R.string.cache_offline_store));
-				offlineStore.setClickable(true);
-				offlineStore.setOnClickListener(new storeCache());
-			}
-
-			// cache short desc
-			if (cache.shortdesc != null && cache.shortdesc.length() > 0) {
-				((LinearLayout) findViewById(R.id.desc_box)).setVisibility(View.VISIBLE);
-
-				TextView descView = (TextView) findViewById(R.id.shortdesc);
-				descView.setVisibility(View.VISIBLE);
-				descView.setText(Html.fromHtml(cache.shortdesc.trim(), new HtmlImg(activity, settings, geocode, true, cache.reason, false), null), TextView.BufferType.SPANNABLE);
-				descView.setMovementMethod(LinkMovementMethod.getInstance());
-			}
-
-			// cache long desc
-			if (longDescDisplayed == true) {
-				if (longDesc == null && cache != null && cache.description != null) {
-					longDesc = Html.fromHtml(cache.description.trim(), new HtmlImg(activity, settings, geocode, true, cache.reason, false), null);
-				}
-
-				if (longDesc != null && longDesc.length() > 0) {
-					((LinearLayout) findViewById(R.id.desc_box)).setVisibility(View.VISIBLE);
-
-					TextView descView = (TextView) findViewById(R.id.description);
-					descView.setVisibility(View.VISIBLE);
-					descView.setText(longDesc, TextView.BufferType.SPANNABLE);
-					descView.setMovementMethod(LinkMovementMethod.getInstance());
-
-					Button showDesc = (Button) findViewById(R.id.show_description);
-					showDesc.setVisibility(View.GONE);
-					showDesc.setOnTouchListener(null);
-					showDesc.setOnClickListener(null);
-				}
-			} else if (longDescDisplayed == false && cache.description != null && cache.description.length() > 0) {
-				((LinearLayout) findViewById(R.id.desc_box)).setVisibility(View.VISIBLE);
-
-				Button showDesc = (Button) findViewById(R.id.show_description);
-				showDesc.setVisibility(View.VISIBLE);
-				showDesc.setOnClickListener(new View.OnClickListener() {
-
-					public void onClick(View arg0) {
-						loadLongDesc();
-					}
-				});
-			}
-
-			// waypoints
-			LinearLayout waypoints = (LinearLayout) findViewById(R.id.waypoints);
-			waypoints.removeAllViews();
-
-			if (cache.waypoints != null && cache.waypoints.size() > 0) {
-				LinearLayout waypointView;
-
-				// sort waypoints: PP, Sx, FI, OWN
-				ArrayList<Waypoint> sortedWaypoints = new ArrayList<Waypoint>(cache.waypoints);
-				Collections.sort(sortedWaypoints, new Comparator<Waypoint>() {
-
-					@Override
-					public int compare(Waypoint wayPoint1, Waypoint wayPoint2) {
-
-						return order(wayPoint1) - order(wayPoint2);
-					}
-
-					private int order(Waypoint waypoint) {
-						if (waypoint.prefix == null || waypoint.prefix.length() == 0) {
-							return 0;
-						}
-						// check only the first character. sometimes there are inconsistencies like FI or FN for the FINAL
-						char firstLetter = Character.toUpperCase(waypoint.prefix.charAt(0));
-						switch (firstLetter) {
-							case 'P':
-								return -100; // parking
-							case 'S': { // stage N
-								try {
-									Integer stageNumber = Integer.valueOf(waypoint.prefix.substring(1));
-									return stageNumber;
-								} catch (NumberFormatException e) {
-									// nothing
-								}
-								return 0;
-							}
-							case 'F':
-								return 1000; // final
-							case 'O':
-								return 10000; // own
-						}
-						return 0;
-					}
-				});
-
-				for (Waypoint wpt : sortedWaypoints) {
-					waypointView = (LinearLayout) inflater.inflate(R.layout.waypoint_item, null);
-					final TextView identification = (TextView) waypointView.findViewById(R.id.identification);
-
-					((TextView) waypointView.findViewById(R.id.type)).setText(Base.waypointTypes.get(wpt.type));
-					if (wpt.prefix.equalsIgnoreCase("OWN") == false) {
-						identification.setText(wpt.prefix.trim() + "/" + wpt.lookup.trim());
-					} else {
-						identification.setText(res.getString(R.string.waypoint_custom));
-					}
-
-					if (wpt.name.trim().length() == 0) {
-						((TextView) waypointView.findViewById(R.id.name)).setText(base.formatCoordinate(wpt.latitude, "lat", true) + " | " + base.formatCoordinate(wpt.longitude, "lon", true));
-					} else {
-						// avoid HTML parsing
-						if (wpt.name.indexOf('<') >= 0 || wpt.name.indexOf('&') >= 0) {
-							((TextView) waypointView.findViewById(R.id.name)).setText(Html.fromHtml(wpt.name.trim()), TextView.BufferType.SPANNABLE);
-						} else {
-							((TextView) waypointView.findViewById(R.id.name)).setText(wpt.name.trim());
-						}
-					}
-					// avoid HTML parsing
-					if (wpt.note.indexOf('<') >= 0 || wpt.note.indexOf('&') >= 0) {
-						((TextView) waypointView.findViewById(R.id.note)).setText(Html.fromHtml(wpt.note.trim()), TextView.BufferType.SPANNABLE);
-					} else {
-						((TextView) waypointView.findViewById(R.id.note)).setText(wpt.note.trim());
-					}
-
-					waypointView.setOnClickListener(new waypointInfo(wpt.id));
-
-					waypoints.addView(waypointView);
-				}
-			}
-
-			Button addWaypoint = (Button) findViewById(R.id.add_waypoint);
-			addWaypoint.setClickable(true);
-			addWaypoint.setOnClickListener(new addWaypoint());
-
-			// cache hint
-			if (cache.hint != null && cache.hint.length() > 0) {
-				((LinearLayout) findViewById(R.id.hint_box)).setVisibility(View.VISIBLE);
-				TextView hintView = ((TextView) findViewById(R.id.hint));
-				hintView.setText(Base.rot13(cache.hint.trim()));
-				hintView.setClickable(true);
-				hintView.setOnClickListener(new codeHint());
-			} else {
-				((LinearLayout) findViewById(R.id.hint_box)).setVisibility(View.GONE);
-				TextView hintView = ((TextView) findViewById(R.id.hint));
-				hintView.setClickable(false);
-				hintView.setOnClickListener(null);
 			}
 
 			if (geo != null && geo.latitudeNow != null && geo.longitudeNow != null && cache != null && cache.latitude != null && cache.longitude != null) {
@@ -1038,9 +755,10 @@ public class cacheDetail extends Activity {
 		} catch (Exception e) {
 			Log.e(Settings.tag, "cgeodetail.setView: " + e.toString());
 		}
-		
-		if (pager != null && pager.getVisibility() == View.GONE) {
+
+		if (pager != null) {
 			pager.setVisibility(View.VISIBLE);
+			pager.getAdapter().notifyDataSetChanged();
 		}
 
 		if (waitDialog != null && waitDialog.isShowing()) {
@@ -1056,39 +774,487 @@ public class cacheDetail extends Activity {
 			refreshDialog.dismiss();
 		}
 
-		displayLogs();
-
 		if (geo != null) {
 			geoUpdate.updateLoc(geo);
 		}
 	}
 
-	private RelativeLayout addStarRating(final LinearLayout detailsList, final String name, final float value) {
-		RelativeLayout itemLayout = (RelativeLayout) inflater.inflate(R.layout.cache_layout, null);
-		TextView itemName = (TextView) itemLayout.findViewById(R.id.name);
-		TextView itemValue = (TextView) itemLayout.findViewById(R.id.value);
-		LinearLayout itemStars = (LinearLayout) itemLayout.findViewById(R.id.stars);
-
-		itemName.setText(name);
-		itemValue.setText(String.format(Locale.getDefault(), "%.1f", value) + ' ' + res.getString(R.string.cache_rating_of) + " 5");
-		for (int i = 0; i <= 4; i++) {
-			ImageView star = (ImageView) inflater.inflate(R.layout.star, null);
-			if ((value - i) >= 1.0) {
-				star.setImageResource(R.drawable.star_on);
-			} else if ((value - i) > 0.0) {
-				star.setImageResource(R.drawable.star_half);
-			} else {
-				star.setImageResource(R.drawable.star_off);
-			}
-			itemStars.addView(star, (1 + i));
+	private void fillTabOrder() {
+		if (tabOrder == null) {
+			tabOrder = new ArrayList<Integer>();
+		} else {
+			tabOrder.clear();
 		}
-		detailsList.addView(itemLayout);
-		return itemLayout;
+
+		tabOrder.add(TAB_DTS);
+		tabOrder.add(TAB_DSC);
+		tabOrder.add(TAB_WPT);
+		if (cache.logs != null && !cache.logs.isEmpty()) {
+			tabOrder.add(TAB_LOG);
+		}
+		if (cache.inventory != null && !cache.inventory.isEmpty()) {
+			tabOrder.add(TAB_INV);
+		}
+		if (cache.attributes != null && !cache.attributes.isEmpty()) {
+			tabOrder.add(TAB_ATR);
+		}
 	}
 
-	private void displayLogs() {
+	private ScrollView viewDetails() {
+		if (cache == null) {
+			return null;
+		}
+
+		final ScrollView view;
+		if (viewDetails == null) {
+			view = (ScrollView) inflater.inflate(R.layout.detail_details, null);
+			viewDetails = view;
+		} else {
+			view = viewDetails;
+		}
+
+		RelativeLayout itemLayout;
+		TextView itemName;
+		TextView itemValue;
+
+		// cache details
+		LinearLayout detailsList = (LinearLayout) view.findViewById(R.id.details_list);
+		detailsList.removeAllViews();
+
+		// cache name (full name)
+		itemLayout = (RelativeLayout) inflater.inflate(R.layout.cache_item, null);
+		itemName = (TextView) itemLayout.findViewById(R.id.name);
+		itemValue = (TextView) itemLayout.findViewById(R.id.value);
+
+		itemName.setText(res.getString(R.string.cache_name));
+		itemValue.setText(Html.fromHtml(cache.name).toString());
+		detailsList.addView(itemLayout);
+
+		// cache type
+		itemLayout = (RelativeLayout) inflater.inflate(R.layout.cache_item, null);
+		itemName = (TextView) itemLayout.findViewById(R.id.name);
+		itemValue = (TextView) itemLayout.findViewById(R.id.value);
+
+		itemName.setText(res.getString(R.string.cache_type));
+
+		String size = null;
+		if (cache.size != null && cache.size.length() > 0) {
+			size = " (" + cache.size + ")";
+		} else {
+			size = "";
+		}
+
+		if (Base.cacheTypesInv.containsKey(cache.type) == true) { // cache icon
+			itemValue.setText(Base.cacheTypesInv.get(cache.type) + size);
+		} else {
+			itemValue.setText(Base.cacheTypesInv.get("mystery") + size);
+		}
+		detailsList.addView(itemLayout);
+
+		// gc-code
+		itemLayout = (RelativeLayout) inflater.inflate(R.layout.cache_item, null);
+		itemName = (TextView) itemLayout.findViewById(R.id.name);
+		itemValue = (TextView) itemLayout.findViewById(R.id.value);
+
+		itemName.setText(res.getString(R.string.cache_geocode));
+		itemValue.setText(cache.geocode.toUpperCase());
+		detailsList.addView(itemLayout);
+
+		// cache state
+		if (cache.logOffline == true || cache.archived == true || cache.disabled == true || cache.members == true || cache.found == true) {
+			itemLayout = (RelativeLayout) inflater.inflate(R.layout.cache_item, null);
+			itemName = (TextView) itemLayout.findViewById(R.id.name);
+			itemValue = (TextView) itemLayout.findViewById(R.id.value);
+
+			itemName.setText(res.getString(R.string.cache_status));
+
+			StringBuilder state = new StringBuilder();
+			if (cache.logOffline == true) {
+				if (state.length() > 0) {
+					state.append(", ");
+				}
+				state.append(res.getString(R.string.cache_status_offline_log));
+			}
+			if (cache.found == true) {
+				if (state.length() > 0) {
+					state.append(", ");
+				}
+				state.append(res.getString(R.string.cache_status_found));
+			}
+			if (cache.archived == true) {
+				if (state.length() > 0) {
+					state.append(", ");
+				}
+				state.append(res.getString(R.string.cache_status_archived));
+			}
+			if (cache.disabled == true) {
+				if (state.length() > 0) {
+					state.append(", ");
+				}
+				state.append(res.getString(R.string.cache_status_disabled));
+			}
+			if (cache.members == true) {
+				if (state.length() > 0) {
+					state.append(", ");
+				}
+				state.append(res.getString(R.string.cache_status_premium));
+			}
+
+			itemValue.setText(state.toString());
+			detailsList.addView(itemLayout);
+
+			state = null;
+		}
+
+		// distance
+		itemLayout = (RelativeLayout) inflater.inflate(R.layout.cache_item, null);
+		itemName = (TextView) itemLayout.findViewById(R.id.name);
+		itemValue = (TextView) itemLayout.findViewById(R.id.value);
+
+		itemName.setText(res.getString(R.string.cache_distance));
+		if (cache.distance != null) {
+			itemValue.setText("~" + base.getHumanDistance(cache.distance));
+		} else {
+			itemValue.setText("--");
+		}
+		detailsList.addView(itemLayout);
+		cacheDistance = itemValue;
+
+		// difficulty
+		if (cache.difficulty != null && cache.difficulty > 0) {
+			addStarRating(detailsList, res.getString(R.string.cache_difficulty), cache.difficulty);
+		}
+
+		// terrain
+		if (cache.terrain != null && cache.terrain > 0) {
+			addStarRating(detailsList, res.getString(R.string.cache_terrain), cache.terrain);
+		}
+
+		// favourite count
+		if (cache.favouriteCnt != null) {
+			itemLayout = (RelativeLayout) inflater.inflate(R.layout.cache_item, null);
+			itemName = (TextView) itemLayout.findViewById(R.id.name);
+			itemValue = (TextView) itemLayout.findViewById(R.id.value);
+
+			itemName.setText(res.getString(R.string.cache_favourite));
+			itemValue.setText(String.format("%d", cache.favouriteCnt) + "×");
+			detailsList.addView(itemLayout);
+		}
+
+		// cache author
+		if ((cache.owner != null && cache.owner.length() > 0) || (cache.ownerReal != null && cache.ownerReal.length() > 0)) {
+			itemLayout = (RelativeLayout) inflater.inflate(R.layout.cache_item, null);
+			itemName = (TextView) itemLayout.findViewById(R.id.name);
+			itemValue = (TextView) itemLayout.findViewById(R.id.value);
+
+			itemName.setText(res.getString(R.string.cache_owner));
+			if (cache.owner != null && cache.owner.length() > 0) {
+				itemValue.setText(Html.fromHtml(cache.owner), TextView.BufferType.SPANNABLE);
+			} else if (cache.ownerReal != null && cache.ownerReal.length() > 0) {
+				itemValue.setText(Html.fromHtml(cache.ownerReal), TextView.BufferType.SPANNABLE);
+			}
+			itemValue.setOnClickListener(new userActions());
+			detailsList.addView(itemLayout);
+		}
+
+		// cache hidden
+		if (cache.hidden != null && cache.hidden.getTime() > 0) {
+			itemLayout = (RelativeLayout) inflater.inflate(R.layout.cache_item, null);
+			itemName = (TextView) itemLayout.findViewById(R.id.name);
+			itemValue = (TextView) itemLayout.findViewById(R.id.value);
+
+			if (cache.type != null && (cache.type.equalsIgnoreCase("event") == true || cache.type.equalsIgnoreCase("mega") == true || cache.type.equalsIgnoreCase("cito") == true)) {
+				itemName.setText(res.getString(R.string.cache_event));
+			} else {
+				itemName.setText(res.getString(R.string.cache_hidden));
+			}
+			itemValue.setText(Base.dateOut.format(cache.hidden));
+			detailsList.addView(itemLayout);
+		}
+
+		// cache location
+		if (cache.location != null && cache.location.length() > 0) {
+			itemLayout = (RelativeLayout) inflater.inflate(R.layout.cache_item, null);
+			itemName = (TextView) itemLayout.findViewById(R.id.name);
+			itemValue = (TextView) itemLayout.findViewById(R.id.value);
+
+			itemName.setText(res.getString(R.string.cache_location));
+			itemValue.setText(cache.location);
+			detailsList.addView(itemLayout);
+		}
+
+		// cache coordinates
+		if (cache.latitude != null && cache.longitude != null) {
+			itemLayout = (RelativeLayout) inflater.inflate(R.layout.cache_item, null);
+			itemName = (TextView) itemLayout.findViewById(R.id.name);
+			itemValue = (TextView) itemLayout.findViewById(R.id.value);
+
+			itemName.setText(res.getString(R.string.cache_coordinates));
+			itemValue.setText(cache.latitudeString + " | " + cache.longitudeString);
+			detailsList.addView(itemLayout);
+		}
+
+		// offline use
+		final TextView offlineText = (TextView) view.findViewById(R.id.offline_text);
+		final Button offlineRefresh = (Button) view.findViewById(R.id.offline_refresh);
+		final Button offlineStore = (Button) view.findViewById(R.id.offline_store);
+
+		if (cache.reason >= 1) {
+			Long diff = (System.currentTimeMillis() / (60 * 1000)) - (cache.detailedUpdate / (60 * 1000)); // minutes
+
+			String ago = "";
+			if (diff < 15) {
+				ago = res.getString(R.string.cache_offline_time_mins_few);
+			} else if (diff < 50) {
+				ago = res.getString(R.string.cache_offline_time_about) + " " + diff + " " + res.getString(R.string.cache_offline_time_mins);
+			} else if (diff < 90) {
+				ago = res.getString(R.string.cache_offline_time_about) + " " + res.getString(R.string.cache_offline_time_hour);
+			} else if (diff < (48 * 60)) {
+				ago = res.getString(R.string.cache_offline_time_about) + " " + (diff / 60) + " " + res.getString(R.string.cache_offline_time_hours);
+			} else {
+				ago = res.getString(R.string.cache_offline_time_about) + " " + (diff / (24 * 60)) + " " + res.getString(R.string.cache_offline_time_days);
+			}
+
+			offlineText.setText(res.getString(R.string.cache_offline_stored) + "\n" + ago);
+
+			offlineRefresh.setVisibility(View.VISIBLE);
+			offlineRefresh.setClickable(true);
+			offlineRefresh.setOnClickListener(new storeCache());
+
+			offlineStore.setText(res.getString(R.string.cache_offline_drop));
+			offlineStore.setClickable(true);
+			offlineStore.setOnClickListener(new dropCache());
+		} else {
+			offlineText.setText(res.getString(R.string.cache_offline_not_ready));
+
+			offlineRefresh.setVisibility(View.VISIBLE);
+			offlineRefresh.setClickable(true);
+			offlineRefresh.setOnClickListener(new refreshCache());
+
+			offlineStore.setText(res.getString(R.string.cache_offline_store));
+			offlineStore.setClickable(true);
+			offlineStore.setOnClickListener(new storeCache());
+		}
+
+		// cache hint
+		if (cache.hint != null && cache.hint.length() > 0) {
+			((LinearLayout) view.findViewById(R.id.hint_box)).setVisibility(View.VISIBLE);
+			TextView hintView = ((TextView) view.findViewById(R.id.hint));
+			hintView.setText(Base.rot13(cache.hint.trim()));
+			hintView.setClickable(true);
+			hintView.setOnClickListener(new codeHint());
+		} else {
+			((LinearLayout) view.findViewById(R.id.hint_box)).setVisibility(View.GONE);
+			TextView hintView = ((TextView) view.findViewById(R.id.hint));
+			hintView.setClickable(false);
+			hintView.setOnClickListener(null);
+		}
+
+		return view;
+	}
+
+	private ScrollView viewDescriptions() {
+		if (cache == null) {
+			return null;
+		}
+
+		final ScrollView view;
+		if (viewDescriptions == null) {
+			view = (ScrollView) inflater.inflate(R.layout.detail_descriptions, null);
+			viewDescriptions = view;
+		} else {
+			view = viewDescriptions;
+		}
+
+		// cache short desc
+		if (cache.shortdesc != null && cache.shortdesc.length() > 0) {
+			TextView descView = (TextView) view.findViewById(R.id.shortdesc);
+			descView.setVisibility(View.VISIBLE);
+			descView.setText(Html.fromHtml(cache.shortdesc.trim(), new HtmlImg(activity, settings, geocode, true, cache.reason, false), null), TextView.BufferType.SPANNABLE);
+			descView.setMovementMethod(LinkMovementMethod.getInstance());
+		}
+
+		// cache long desc
+		if (longDescDisplayed == true) {
+			if (longDesc == null && cache != null && cache.description != null) {
+				longDesc = Html.fromHtml(cache.description.trim(), new HtmlImg(activity, settings, geocode, true, cache.reason, false), null);
+			}
+
+			if (longDesc != null && longDesc.length() > 0) {
+				TextView descView = (TextView) view.findViewById(R.id.description);
+				descView.setVisibility(View.VISIBLE);
+				descView.setText(longDesc, TextView.BufferType.SPANNABLE);
+				descView.setMovementMethod(LinkMovementMethod.getInstance());
+
+				Button showDesc = (Button) view.findViewById(R.id.show_description);
+				showDesc.setVisibility(View.GONE);
+				showDesc.setOnTouchListener(null);
+				showDesc.setOnClickListener(null);
+			}
+		} else if (longDescDisplayed == false && cache.description != null && cache.description.length() > 0) {
+			Button showDesc = (Button) view.findViewById(R.id.show_description);
+			showDesc.setVisibility(View.VISIBLE);
+			showDesc.setOnClickListener(new View.OnClickListener() {
+
+				public void onClick(View arg0) {
+					loadLongDesc(view);
+				}
+			});
+		}
+
+		return view;
+	}
+
+	private ScrollView viewWaypoints() {
+		if (cache == null) {
+			return null;
+		}
+
+		final ScrollView view;
+		if (viewWaypoints == null) {
+			view = (ScrollView) inflater.inflate(R.layout.detail_waypoints, null);
+			viewWaypoints = view;
+		} else {
+			view = viewWaypoints;
+		}
+
+		// waypoints
+		LinearLayout waypoints = (LinearLayout) view.findViewById(R.id.waypoints);
+		waypoints.removeAllViews();
+
+		if (cache.waypoints != null && cache.waypoints.size() > 0) {
+			LinearLayout waypointView;
+
+			// sort waypoints: PP, Sx, FI, OWN
+			ArrayList<Waypoint> sortedWaypoints = new ArrayList<Waypoint>(cache.waypoints);
+			Collections.sort(sortedWaypoints, new Comparator<Waypoint>() {
+
+				@Override
+				public int compare(Waypoint wayPoint1, Waypoint wayPoint2) {
+
+					return order(wayPoint1) - order(wayPoint2);
+				}
+
+				private int order(Waypoint waypoint) {
+					if (waypoint.prefix == null || waypoint.prefix.length() == 0) {
+						return 0;
+					}
+					// check only the first character. sometimes there are inconsistencies like FI or FN for the FINAL
+					char firstLetter = Character.toUpperCase(waypoint.prefix.charAt(0));
+					switch (firstLetter) {
+						case 'P':
+							return -100; // parking
+						case 'S': { // stage N
+							try {
+								Integer stageNumber = Integer.valueOf(waypoint.prefix.substring(1));
+								return stageNumber;
+							} catch (NumberFormatException e) {
+								// nothing
+							}
+							return 0;
+						}
+						case 'F':
+							return 1000; // final
+						case 'O':
+							return 10000; // own
+					}
+					return 0;
+				}
+			});
+
+			for (Waypoint wpt : sortedWaypoints) {
+				waypointView = (LinearLayout) inflater.inflate(R.layout.waypoint_item, null);
+				final TextView identification = (TextView) waypointView.findViewById(R.id.identification);
+
+				((TextView) waypointView.findViewById(R.id.type)).setText(Base.waypointTypes.get(wpt.type));
+				if (wpt.prefix.equalsIgnoreCase("OWN") == false) {
+					identification.setText(wpt.prefix.trim() + "/" + wpt.lookup.trim());
+				} else {
+					identification.setText(res.getString(R.string.waypoint_custom));
+				}
+
+				if (wpt.name.trim().length() == 0) {
+					((TextView) waypointView.findViewById(R.id.name)).setText(base.formatCoordinate(wpt.latitude, "lat", true) + " | " + base.formatCoordinate(wpt.longitude, "lon", true));
+				} else {
+					// avoid HTML parsing
+					if (wpt.name.indexOf('<') >= 0 || wpt.name.indexOf('&') >= 0) {
+						((TextView) waypointView.findViewById(R.id.name)).setText(Html.fromHtml(wpt.name.trim()), TextView.BufferType.SPANNABLE);
+					} else {
+						((TextView) waypointView.findViewById(R.id.name)).setText(wpt.name.trim());
+					}
+				}
+				// avoid HTML parsing
+				if (wpt.note.indexOf('<') >= 0 || wpt.note.indexOf('&') >= 0) {
+					((TextView) waypointView.findViewById(R.id.note)).setText(Html.fromHtml(wpt.note.trim()), TextView.BufferType.SPANNABLE);
+				} else {
+					((TextView) waypointView.findViewById(R.id.note)).setText(wpt.note.trim());
+				}
+
+				waypointView.setOnClickListener(new waypointInfo(wpt.id));
+
+				waypoints.addView(waypointView);
+			}
+		}
+
+		Button addWaypoint = (Button) view.findViewById(R.id.add_waypoint);
+		addWaypoint.setClickable(true);
+		addWaypoint.setOnClickListener(new addWaypoint());
+
+		return view;
+	}
+
+	private ScrollView viewInventory() {
+		if (cache == null) {
+			return null;
+		}
+
+		final ScrollView view;
+		if (viewInventory == null) {
+			view = (ScrollView) inflater.inflate(R.layout.detail_inventory, null);
+			viewInventory = view;
+		} else {
+			view = viewInventory;
+		}
+
+		// cache inventory
+		if (cache.inventory != null && cache.inventory.size() > 0) {
+			final LinearLayout inventBox = (LinearLayout) view.findViewById(R.id.inventory_box);
+
+			LinearLayout oneTbPre = null;
+			for (Trackable trackable : cache.inventory) {
+				oneTbPre = (LinearLayout) inflater.inflate(R.layout.trackable_button, null);
+
+				Button oneTb = (Button) oneTbPre.findViewById(R.id.button);
+
+				if (trackable.name != null) {
+					oneTb.setText(Html.fromHtml(trackable.name).toString());
+				} else {
+					oneTb.setText("some trackable");
+				}
+				oneTb.setClickable(true);
+				oneTb.setOnClickListener(new tbButtonListener(trackable.guid, trackable.geocode, trackable.name));
+				inventBox.addView(oneTbPre);
+			}
+		}
+
+		return view;
+	}
+
+	private ScrollView viewLogs() {
+		if (cache == null) {
+			return null;
+		}
+
+		final ScrollView view;
+		if (viewLogs == null) {
+			view = (ScrollView) inflater.inflate(R.layout.detail_logs, null);
+			viewLogs = view;
+		} else {
+			view = viewLogs;
+		}
+
 		// cache logs
-		TextView textView = (TextView) findViewById(R.id.logcount);
+		TextView textView = (TextView) view.findViewById(R.id.logcount);
 		int logCounter = 0;
 		if (cache != null && cache.logCounts != null) {
 			final StringBuffer buff = new StringBuffer();
@@ -1131,12 +1297,12 @@ public class cacheDetail extends Activity {
 		}
 
 		// cache logs
-		LinearLayout listView = (LinearLayout) findViewById(R.id.log_list);
+		LinearLayout listView = (LinearLayout) view.findViewById(R.id.log_list);
 		listView.removeAllViews();
 
 		RelativeLayout rowView;
 
-		if (cache != null && cache.logs != null) {
+		if (cache != null && cache.logs != null && !cache.logs.isEmpty()) {
 			for (CacheLog log : cache.logs) {
 				rowView = (RelativeLayout) inflater.inflate(R.layout.log_item, null);
 
@@ -1199,11 +1365,98 @@ public class cacheDetail extends Activity {
 
 				listView.addView(rowView);
 			}
-
-			if (cache.logs.size() > 0) {
-				((LinearLayout) findViewById(R.id.log_box)).setVisibility(View.VISIBLE);
-			}
 		}
+
+		return view;
+	}
+
+	private ScrollView viewAttributes() {
+		if (cache == null) {
+			return null;
+		}
+
+		final ScrollView view;
+		if (viewAttributes == null) {
+			view = (ScrollView) inflater.inflate(R.layout.detail_attributes, null);
+			viewAttributes = view;
+		} else {
+			view = viewAttributes;
+		}
+
+		// cache attributes
+		if (cache.attributes != null && !cache.attributes.isEmpty()) {
+			final TextView attribView = (TextView) view.findViewById(R.id.attributes);
+
+			StringBuilder buffer = new StringBuilder();
+			String attribute;
+			for (int i = 0; i < cache.attributes.size(); i++) {
+				attribute = cache.attributes.get(i);
+
+				// dynamically search for a translation of the attribute
+				int id = res.getIdentifier("attribute_" + attribute, "string", base.context.getPackageName());
+				if (id > 0) {
+					String translated = res.getString(id);
+					if (translated != null && translated.length() > 0) {
+						attribute = translated;
+					}
+				}
+				if (buffer.length() > 0) {
+					buffer.append('\n');
+				}
+				buffer.append(attribute);
+			}
+
+			attribView.setText(buffer);
+		}
+
+		return view;
+	}
+	
+	private class tbButtonListener implements View.OnClickListener {
+
+		private String guid = null;
+		private String geocode = null;
+		private String name = null;
+
+		public tbButtonListener(String guidIn, String geocodeIn, String nameIn) {
+			guid = guidIn;
+			geocode = geocodeIn;
+			name = nameIn;
+		}
+
+		public void onClick(View arg0) {
+			Intent trackableIntent = new Intent(activity, trackableDetail.class);
+			trackableIntent.putExtra("guid", guid);
+			trackableIntent.putExtra("geocode", geocode);
+			trackableIntent.putExtra("name", name);
+			activity.startActivity(trackableIntent);
+
+			finish();
+			return;
+		}
+	}
+
+	private RelativeLayout addStarRating(final LinearLayout detailsList, final String name, final float value) {
+		RelativeLayout itemLayout = (RelativeLayout) inflater.inflate(R.layout.cache_layout, null);
+		TextView itemName = (TextView) itemLayout.findViewById(R.id.name);
+		TextView itemValue = (TextView) itemLayout.findViewById(R.id.value);
+		LinearLayout itemStars = (LinearLayout) itemLayout.findViewById(R.id.stars);
+
+		itemName.setText(name);
+		itemValue.setText(String.format(Locale.getDefault(), "%.1f", value) + ' ' + res.getString(R.string.cache_rating_of) + " 5");
+		for (int i = 0; i <= 4; i++) {
+			ImageView star = (ImageView) inflater.inflate(R.layout.star, null);
+			if ((value - i) >= 1.0) {
+				star.setImageResource(R.drawable.star_on);
+			} else if ((value - i) > 0.0) {
+				star.setImageResource(R.drawable.star_half);
+			} else {
+				star.setImageResource(R.drawable.star_off);
+			}
+			itemStars.addView(star, (1 + i));
+		}
+		detailsList.addView(itemLayout);
+		return itemLayout;
 	}
 
 	private class loadCache extends Thread {
@@ -1242,48 +1495,13 @@ public class cacheDetail extends Activity {
 		}
 	}
 
-	private class loadMapPreview extends Thread {
-
-		private Cache cache = null;
-		private Handler handler = null;
-
-		public loadMapPreview(Cache cacheIn, Handler handlerIn) {
-			cache = cacheIn;
-			handler = handlerIn;
-		}
-
-		@Override
-		public void run() {
-			if (cache == null || cache.latitude == null || cache.longitude == null) {
-				return;
-			}
-
-			BitmapDrawable image = null;
-
-			try {
-				final String latlonMap = String.format((Locale) null, "%.6f", cache.latitude) + "," + String.format((Locale) null, "%.6f", cache.longitude);
-				final Display display = ((WindowManager) activity.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
-
-				int width = display.getWidth();
-				int height = (int) (90 * pixelRatio);
-
-				String markerUrl = Base.urlencode_rfc3986("http://cgeo.carnero.cc/_markers/my_location_mdpi.png");
-
-				HtmlImg mapGetter = new HtmlImg(activity, settings, cache.geocode, false, 0, false);
-				image = mapGetter.getDrawable("http://maps.google.com/maps/api/staticmap?center=" + latlonMap + "&zoom=15&size=" + width + "x" + height + "&maptype=terrain&markers=icon%3A" + markerUrl + "%7C" + latlonMap + "&sensor=false");
-				Message message = handler.obtainMessage(0, image);
-				handler.sendMessage(message);
-			} catch (Exception e) {
-				Log.w(Settings.tag, "cgeodetail.loadMapPreview.run: " + e.toString());
-			}
-		}
-	}
-
-	public void loadLongDesc() {
+	public void loadLongDesc(ScrollView view) {
 		if (activity != null && (waitDialog == null || waitDialog.isShowing() == false)) {
 			descDialog = ProgressDialog.show(activity, null, res.getString(R.string.cache_dialog_loading_description), true);
 			descDialog.setCancelable(true);
 		}
+
+		loadDescriptionHandler.setView(view);
 
 		threadLongDesc = new loadLongDesc(loadDescriptionHandler);
 		threadLongDesc.start();
@@ -1305,6 +1523,54 @@ public class cacheDetail extends Activity {
 
 			longDesc = Html.fromHtml(cache.description.trim(), new HtmlImg(activity, settings, geocode, true, cache.reason, false), null);
 			handler.sendMessage(new Message());
+		}
+	}
+
+	private class LoadDescriptionHandler extends Handler {
+
+		ScrollView view;
+
+		@Override
+		public void handleMessage(Message msg) {
+			if (longDesc == null && cache != null && cache.description != null) {
+				longDesc = Html.fromHtml(cache.description.trim(), new HtmlImg(activity, settings, geocode, true, cache.reason, false), null);
+			}
+
+			if (view == null) {
+				if (descDialog != null && descDialog.isShowing()) {
+					descDialog.dismiss();
+				}
+
+				return;
+			}
+
+			if (longDesc != null) {
+				TextView descView = (TextView) view.findViewById(R.id.description);
+				if (cache.description.length() > 0) {
+					descView.setVisibility(View.VISIBLE);
+					descView.setText(longDesc, TextView.BufferType.SPANNABLE);
+					descView.setMovementMethod(LinkMovementMethod.getInstance());
+				} else {
+					descView.setVisibility(View.GONE);
+				}
+
+				Button showDesc = (Button) view.findViewById(R.id.show_description);
+				showDesc.setVisibility(View.GONE);
+				showDesc.setOnTouchListener(null);
+				showDesc.setOnClickListener(null);
+			} else {
+				warning.showToast(res.getString(R.string.err_load_descr_failed));
+			}
+
+			if (descDialog != null && descDialog.isShowing()) {
+				descDialog.dismiss();
+			}
+
+			longDescDisplayed = true;
+		}
+
+		public void setView(ScrollView v) {
+			view = v;
 		}
 	}
 
@@ -1682,20 +1948,6 @@ public class cacheDetail extends Activity {
 		}
 	}
 
-	private class selectTrackable implements View.OnClickListener {
-
-		public void onClick(View arg0) {
-			// show list of trackableList
-			try {
-				Intent trackablesIntent = new Intent(activity, trackableList.class);
-				trackablesIntent.putExtra("geocode", geocode.toUpperCase());
-				activity.startActivity(trackablesIntent);
-			} catch (Exception e) {
-				Log.e(Settings.tag, "cgeodetail.selectTrackable: " + e.toString());
-			}
-		}
-	}
-
 	private class storeCache implements View.OnClickListener {
 
 		public void onClick(View arg0) {
@@ -1908,54 +2160,5 @@ public class cacheDetail extends Activity {
 		}
 		navigate.coordinates = getCoordinates();
 		activity.startActivity(navigateIntent);
-	}
-
-	private class Adapter extends PagerAdapter {
-
-		@Override
-		public Object instantiateItem(View collection, int position) {
-			final ScrollView view = (ScrollView) pager.getChildAt(position);
-
-			return view;
-		}
-
-		@Override
-		public int getCount() {
-			return pager.getChildCount();
-		}
-
-		@Override
-		public void destroyItem(View pager, int position, Object view) {
-			// no not destroy views
-		}
-
-		@Override
-		public boolean isViewFromObject(View view, Object object) {
-			if (object instanceof ScrollView && view == (ScrollView) object) {
-				return true;
-			}
-
-			return false;
-		}
-
-		@Override
-		public void finishUpdate(View arg0) {
-			// nothing
-		}
-
-		@Override
-		public void restoreState(Parcelable arg0, ClassLoader arg1) {
-			// nothing
-		}
-
-		@Override
-		public Parcelable saveState() {
-			return null;
-		}
-
-		@Override
-		public void startUpdate(View arg0) {
-			// nothing
-		}
 	}
 }

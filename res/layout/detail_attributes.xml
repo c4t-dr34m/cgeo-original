@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+		android:id="@+id/tab_atr"
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent"
+		android:padding="4dip"
+		android:orientation="vertical" >
+
+	<!-- attributes -->
+	<LinearLayout android:id="@+id/attributes_box"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:orientation="vertical"  >
+		<TextView android:id="@+id/attributes"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:layout_gravity="left"
+				android:padding="3dip"
+				android:textSize="14dip"
+				android:textColor="?text_color"
+				android:linksClickable="true"
+				android:textColorLink="?text_color_link" />
+	</LinearLayout>
+</ScrollView>

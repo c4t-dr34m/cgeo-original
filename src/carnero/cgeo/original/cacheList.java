@@ -55,6 +55,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import carnero.cgeo.original.comparators.CacheFoundComparator;
 import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
@@ -587,9 +588,9 @@ public class cacheList extends ListActivity {
 		SubMenu subMenuSort = menu.addSubMenu(0, 104, 0, res.getString(R.string.caches_sort)).setIcon(android.R.drawable.ic_menu_sort_alphabetically);
 		subMenuSort.setHeaderTitle(res.getString(R.string.caches_sort_title));
 
-		// sort the context menu labels alphabetically for easier reading
 		HashMap<String, Integer> comparators = new HashMap<String, Integer>();
 		comparators.put(res.getString(R.string.caches_sort_distance), 10);
+		comparators.put(res.getString(R.string.caches_sort_found), 22);
 		comparators.put(res.getString(R.string.caches_sort_difficulty), 11);
 		comparators.put(res.getString(R.string.caches_sort_terrain), 12);
 		comparators.put(res.getString(R.string.caches_sort_size), 13);
@@ -734,6 +735,9 @@ public class cacheList extends ListActivity {
 				return false;
 			case 10:
 				setComparator(item, null);
+				return false;
+			case 22:
+				setComparator(item, new CacheFoundComparator());
 				return false;
 			case 11:
 				setComparator(item, new CacheDifficultyComparator());
