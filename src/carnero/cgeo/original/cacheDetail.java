@@ -80,6 +80,7 @@ public class cacheDetail extends Activity {
 	private TextView indicatorCurrent;
 	private TextView indicatorPrev;
 	private TextView indicatorNext;
+	private int lastUsedTab = 0;
 	private ArrayList<Integer> tabOrder;
 	private ScrollView viewDetails;
 	private ScrollView viewDescriptions;
@@ -644,6 +645,8 @@ public class cacheDetail extends Activity {
 			} else {
 				indicatorNext.setVisibility(View.GONE);
 			}
+			
+			lastUsedTab = position;
 		}
 	}
 	
@@ -700,7 +703,7 @@ public class cacheDetail extends Activity {
 		}
 
 		final ViewPager.OnPageChangeListener pagerListener = new Indicator();
-		pagerListener.onPageSelected(0);
+		pagerListener.onPageSelected(lastUsedTab);
 		
 		pager = (ViewPager) findViewById(R.id.pager);
 		pager.setOnPageChangeListener(pagerListener);
