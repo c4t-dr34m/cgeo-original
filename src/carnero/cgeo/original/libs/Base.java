@@ -1089,7 +1089,8 @@ public class Base {
 		final Pattern patternDesc = Pattern.compile("<div class=\"UserSuppliedContent\">[^<]*<span id=\"ctl00_ContentBody_LongDescription\"[^>]*>((?:(?!</span>[^\\w^<]*</div>).)*)</span>[^<]*</div>[^<]*<p>[^<]*</p>[^<]*<p>[^<]*<strong>[^\\w]*Additional Hints</strong>", Pattern.CASE_INSENSITIVE);
 		final Pattern patternCountLogs = Pattern.compile("<span id=\"ctl00_ContentBody_lblFindCounts\"><p>(.*)<\\/p><\\/span>", Pattern.CASE_INSENSITIVE);
 		final Pattern patternCountLog = Pattern.compile(" src=\"\\/images\\/icons\\/([^\\.]*).gif\" alt=\"[^\"]*\" title=\"[^\"]*\" />([0-9]*)[^0-9]+", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
-		final Pattern patternLogs = Pattern.compile("<table class=\"LogsTable[^\"]*\"[^>]*>((?:(?!</table>).)*)</table>[^<]*<p", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
+		// final Pattern patternLogs = Pattern.compile("<table class=\"LogsTable[^\"]*\"[^>]*>((?:(?!</table>).)*)</table>[^<]*<p", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
+		final Pattern patternLogs = Pattern.compile("<table class=\"LogsTable[^\"]*\"[^>]*>(.*)</table>[^<]*<p", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
 		/*
 		 * <tr>
 		 * <td class="Nothing">
@@ -1598,10 +1599,12 @@ public class Base {
 		try {
 			final Matcher matcherLogs = patternLogs.matcher(page);
 			while (matcherLogs.find()) {
+				Log.d(">>>>", "cnt: " + matcherLogs.groupCount());
+				
 				if (matcherLogs.groupCount() > 0) {
 					final String[] logs = matcherLogs.group(1).split("</tr><tr>");
 					final int logsCnt = logs.length;
-
+					
 					for (int k = 0; k < logsCnt; k++) {
 						final CacheLog logDone = new CacheLog();
 						Matcher matcher;

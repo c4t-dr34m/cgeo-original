@@ -100,7 +100,7 @@ public class cacheDetail extends Activity {
 	private ProgressDialog waitDialog = null;
 	private ProgressDialog descDialog = null;
 	private Spanned longDesc = null;
-	private Boolean longDescDisplayed = false;
+	private boolean longDescDisplayed = false;
 	private loadCache threadCache = null;
 	private loadLongDesc threadLongDesc = null;
 	private Thread storeThread = null;
@@ -788,7 +788,7 @@ public class cacheDetail extends Activity {
 		} else {
 			tabOrder.clear();
 		}
-
+		
 		tabOrder.add(TAB_DTS);
 		tabOrder.add(TAB_DSC);
 		tabOrder.add(TAB_WPT);
@@ -1095,14 +1095,7 @@ public class cacheDetail extends Activity {
 				showDesc.setOnClickListener(null);
 			}
 		} else if (longDescDisplayed == false && cache.description != null && cache.description.length() > 0) {
-			Button showDesc = (Button) view.findViewById(R.id.show_description);
-			showDesc.setVisibility(View.VISIBLE);
-			showDesc.setOnClickListener(new View.OnClickListener() {
-
-				public void onClick(View arg0) {
-					loadLongDesc(view);
-				}
-			});
+			loadLongDesc(view);
 		}
 
 		return view;
@@ -1568,6 +1561,10 @@ public class cacheDetail extends Activity {
 			if (descDialog != null && descDialog.isShowing()) {
 				descDialog.dismiss();
 			}
+			if (waitDialog != null && waitDialog.isShowing()) {
+				waitDialog.dismiss();
+			}
+
 
 			longDescDisplayed = true;
 		}
