@@ -408,7 +408,7 @@ public class Base {
 
 	public int login() {
 		final String host = "www.geocaching.com";
-		final String path = "/login/default.aspx";
+		final String path = "/login/default.aspx?redir=/default.aspx?";
 		Response loginResponse = null;
 		String loginData = null;
 
@@ -461,10 +461,10 @@ public class Base {
 			params.put("__VIEWSTATE1", viewstate1);
 			params.put("__VIEWSTATEFIELDCOUNT", "2");
 		}
-		params.put("ctl00$SiteContent$tbUsername", login.get("username"));
-		params.put("ctl00$SiteContent$tbPassword", login.get("password"));
-		params.put("ctl00$SiteContent$cbRememberMe", "on");
-		params.put("ctl00$SiteContent$btnSignIn", "Login");
+		params.put("ctl00$tbUsername", login.get("username"));
+		params.put("ctl00$tbPassword", login.get("password"));
+		params.put("ctl00$cbRememberMe", "on");
+		params.put("ctl00$btnSignIn", "Sign In");
 
 		loginResponse = request(true, host, path, "POST", params, false, false, false);
 		loginData = loginResponse.getData();
@@ -1082,7 +1082,7 @@ public class Base {
 		final Pattern patternFavourite = Pattern.compile("<a id=\"uxFavContainerLink\"[^>]*>[^<]*<div[^<]*<span class=\"favorite-value\">[^\\d]*([0-9]+)[^\\d^<]*</span>", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
 
 		final Pattern patternFound = Pattern.compile("<p>[^<]*<a id=\"ctl00_ContentBody_hlFoundItLog\"[^<]*<img src=\".*/images/stockholm/16x16/check\\.gif\"[^>]*>[^<]*</a>[^<]*</p>", Pattern.CASE_INSENSITIVE);
-		final Pattern patternLatLon = Pattern.compile("<span id=\"ctl00_ContentBody_LatLon\"[^>]*>(<b>)?([^<]*)(<\\/b>)?<\\/span>", Pattern.CASE_INSENSITIVE);
+		final Pattern patternLatLon = Pattern.compile("<span id=\"uxLatLon\"[^>]*>([^<]*)<\\/span>", Pattern.CASE_INSENSITIVE);
 		final Pattern patternLocation = Pattern.compile("<span id=\"ctl00_ContentBody_Location\"[^>]*>In ([^<]*)", Pattern.CASE_INSENSITIVE);
 		final Pattern patternHint = Pattern.compile("<p>([^<]*<strong>)?[^\\w]*Additional Hints([^<]*<\\/strong>)?[^\\(]*\\(<a[^>]+>Encrypt</a>\\)[^<]*<\\/p>[^<]*<div id=\"div_hint\"[^>]*>(.*)</div>[^<]*<div id=[\\'|\"]dk[\\'|\"]", Pattern.CASE_INSENSITIVE);
 		final Pattern patternDescShort = Pattern.compile("<div class=\"UserSuppliedContent\">[^<]*<span id=\"ctl00_ContentBody_ShortDescription\"[^>]*>((?:(?!</span>[^\\w^<]*</div>).)*)</span>[^\\w^<]*</div>", Pattern.CASE_INSENSITIVE);
@@ -1383,7 +1383,7 @@ public class Base {
 			final Matcher matcherLatLon = patternLatLon.matcher(page);
 			while (matcherLatLon.find()) {
 				if (matcherLatLon.groupCount() > 0) {
-					cache.latlon = matcherLatLon.group(2); // first is <b>
+					cache.latlon = matcherLatLon.group(1);
 
 					HashMap<String, Object> tmp = this.parseLatlon(cache.latlon);
 					if (tmp.size() > 0) {
